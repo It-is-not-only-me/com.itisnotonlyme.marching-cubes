@@ -1,0 +1,16 @@
+{
+    "name": "com.itisnotonlyme.nombre",
+    "version": "1.0.0",
+    "displayName": "Nombre Lindo",
+    "description": "Descripcion linda",
+    "unity": "2020.3",
+    "keywords": [
+      "Key", 
+      "Words"
+    ],
+    "author": {
+      "name": "Juan Ignacio Biancuzzo",
+      "email": "jbiancuzzo@fi.uba.ar"
+    },
+    "type": "tool"
+  }
