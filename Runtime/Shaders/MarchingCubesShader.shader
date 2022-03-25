@@ -1,4 +1,4 @@
-Shader "Custom/MarchingCubes"
+Shader "MarchingCubes/Render"
 {
     Properties
     {
@@ -19,21 +19,21 @@ Shader "Custom/MarchingCubes"
             #include "UnityCG.cginc"
 
             struct Triangulo {
-                float3 vertexC;
-                float3 vertexB;
                 float3 vertexA;
+                float3 vertexB;
+                float3 vertexC;
 
                 float3 normal;
             };
 
-            StructuredBuffer<Triangulo> buffer;
+            StructuredBuffer<Triangulo> triangulos;
 
             struct v2g
             {
-                float4 vertexA : TEXCOORD0;
-                float4 vertexB : TEXCOORD1;
-                float4 vertexC : TEXCOORD3;
-                float3 normal  : TEXCOORD4;
+                float4 vertexA : SV_Position;
+                float4 vertexB : TEXCOORD0;
+                float4 vertexC : TEXCOORD1;
+                float3 normal  : TEXCOORD2;
             };
 
             struct g2f
@@ -44,12 +44,12 @@ Shader "Custom/MarchingCubes"
 
             v2g vert (uint id : SV_VertexID)
             {
-                Triangulo triangulo = buffer[id];
+                Triangulo triangulo = triangulos[id];
 
                 v2g o;
-                o.vertexC = float4(triangulo.vertexC, 1);
-                o.vertexB = float4(triangulo.vertexB, 1);
                 o.vertexA = float4(triangulo.vertexA, 1);
+                o.vertexB = float4(triangulo.vertexB, 1);
+                o.vertexC = float4(triangulo.vertexC, 1);
                 o.normal = triangulo.normal;
                 return o;
             }
@@ -77,6 +77,7 @@ Shader "Custom/MarchingCubes"
             {
                 return float4(1, 1, 1, 1);
             }
+
             ENDCG
         }
     }

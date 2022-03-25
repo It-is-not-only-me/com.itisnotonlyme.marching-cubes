@@ -1,7 +1,9 @@
 {
     "name": "com.itisnotonlyme.marching-cubes",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:c21d03730e10f2047b1762572fe57fc5"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
