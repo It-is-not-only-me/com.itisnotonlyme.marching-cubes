@@ -6,9 +6,11 @@ using ItIsNotOnlyMe.MarchingCubes;
 public class ObtenerDatosEjemplo : ObtenerDatosSO
 {
     [SerializeField] private uint _dimensionX, _dimensionY, _dimensionZ;
+    [SerializeField] private float _velocidad;
 
     private Vector3Int _dimension;
     private bool _creado = false;
+    private float _desfase = 0f;
 
     public Vector3Int Dimension
     {
@@ -35,13 +37,14 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
 
     public override IEnumerable<Dato> GetDatos()
     {
-        float noiseScale = 0.05f;
+        _desfase += _velocidad;
+        float noiseScale = 0.9f;
         for (int i = 0; i < _dimensionX; i++)
             for (int j = 0; j < _dimensionY; j++)
                 for (int k = 0; k < _dimensionZ; k++)
                 {
                     Vector3Int posicion = new Vector3Int(i, j, k);
-                    float valor = PerlinNoise3D(i * noiseScale, j * noiseScale, k * noiseScale);
+                    float valor = PerlinNoise3D(i * noiseScale + _desfase, j * noiseScale, k * noiseScale);
                     yield return new Dato(posicion, valor);
                 }
     }

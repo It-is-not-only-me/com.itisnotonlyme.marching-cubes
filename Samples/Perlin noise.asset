@@ -15,3 +15,4 @@ MonoBehaviour:
   _dimensionX: 10
   _dimensionY: 10
   _dimensionZ: 10
+  _velocidad: 0.01

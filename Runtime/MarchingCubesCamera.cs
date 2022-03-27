@@ -8,7 +8,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
     public class MarchingCubesCamera : MonoBehaviour
     {
         [SerializeField] private ComputeShader _computeShader;
-        [SerializeField] private Material _material;
+        [SerializeField] private Shader _geometryShader;
         [SerializeField] private ObtenerDatosSO _datos;
 
         [Space]
@@ -17,22 +17,28 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private ComputeBuffer _triangulosBuffer, _datosBuffer, _argBuffer;
         private Vector3Int _dimensiones;
+        private Material _material;
 
-        private void OnPostRender()
+        private void Awake()
         {
+            _material = new Material(_geometryShader);
+
             _dimensiones = _datos.GetDimensiones();
             bool sePudoCrear = CrearBuffers();
             if (!sePudoCrear)
                 return;
+        }
 
+        private void OnRenderObject()
+        {
             CargarDatos();
 
-            SetearBuffers();
+            Dispatch();
 
             Render();
-
-            DestruirBuffers();
         }
+
+        private void OnDestroy() => DestruirBuffers();
 
         private bool CrearBuffers()
         {
@@ -43,13 +49,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
             if (datosCount <= 1)
                 return false;
 
-            int datosStride = 3 * sizeof(int) + 1 * sizeof(float);
+            int datosStride =  4 * sizeof(float);
 
             // 5 es la cantidad de triangulos maximos que va a tener un cube segun el algoritmo
             int triangulosCount = datosCount * 5;
-            int trianguloStride = 4 * ( 3 * sizeof(float) );
+            int trianguloStride = 3 * ( 3 * sizeof(float) );
 
-            int argCount = 5;
+            int argCount = 4;
             int argStride = sizeof(int);
 
             _datosBuffer = new ComputeBuffer(datosCount, datosStride);
@@ -73,21 +79,23 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 j++;
             }
 
+            _datosBuffer.SetCounterValue(0);
+            _triangulosBuffer.SetCounterValue(0);
             _datosBuffer.SetData(datos);
         }
 
-        private void SetearBuffers()
+        private void Dispatch()
         {
             int kernel = _computeShader.FindKernel("March");
 
             _computeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
             _computeShader.SetBuffer(kernel, "datos", _datosBuffer);
-            _computeShader.SetFloat(kernel, _isoLevel);
-            _computeShader.SetInts(kernel, _dimensiones.x, _dimensiones.y, _dimensiones.z);
+            _computeShader.SetFloat("isoLevel", _isoLevel);
+            _computeShader.SetInts("numPointsPerAxis", _dimensiones.x, _dimensiones.y, _dimensiones.z);
 
             _computeShader.Dispatch(kernel, _dimensiones.x, _dimensiones.y, _dimensiones.z);
 
-            int[] args = new int[] { 0, 1, 0, 0, 0};
+            int[] args = new int[] { 0, 1, 0, 0 };
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(_triangulosBuffer, _argBuffer, 0);
             _argBuffer.GetData(args);
@@ -97,7 +105,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             _material.SetPass(0);
             _material.SetBuffer("triangulos", _triangulosBuffer);
-            Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer, 0);
+            Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
         }
 
         private void DestruirBuffers()
