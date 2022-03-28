@@ -63,7 +63,7 @@ Shader "MarchingCubes/Render"
                 v2g triangulo = patch[0];
 
                 g2f vertice1;
-                vertice1.vertex = UnityObjectToClipPos(triangulo.vertexA);
+                vertice1.vertex = UnityObjectToClipPos(triangulo.vertexC);
                 vertice1.normal = triangulo.normal;
                 triStream.Append(vertice1);
 
@@ -73,7 +73,7 @@ Shader "MarchingCubes/Render"
                 triStream.Append(vertice2);
 
                 g2f vertice3;
-                vertice3.vertex = UnityObjectToClipPos(triangulo.vertexC);
+                vertice3.vertex = UnityObjectToClipPos(triangulo.vertexA);
                 vertice3.normal = triangulo.normal;
                 triStream.Append(vertice3);
 

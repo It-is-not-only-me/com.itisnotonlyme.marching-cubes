@@ -29,12 +29,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 return;
         }
 
-        private void OnRenderObject()
+        private void FixedUpdate()
         {
             CargarDatos();
 
             Dispatch();
+        }
 
+        private void OnRenderObject()
+        {
             Render();
         }
 

@@ -6,7 +6,12 @@ using ItIsNotOnlyMe.MarchingCubes;
 public class ObtenerDatosEjemplo : ObtenerDatosSO
 {
     [SerializeField] private uint _dimensionX, _dimensionY, _dimensionZ;
+    [SerializeField] private float _scale;
+
+    [Space]
+
     [SerializeField] private float _velocidad;
+    [SerializeField] private float _noiseScale;
 
     private Vector3Int _dimension;
     private bool _creado = false;
@@ -38,7 +43,19 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     public override IEnumerable<Dato> GetDatos()
     {
         _desfase += _velocidad;
-        float noiseScale = 0.9f;
+        float noiseScale = 0.05f;
+        for (int i = 0; i < _dimensionX; i++)
+            for (int j = 0; j < _dimensionY; j++)
+                for (int k = 0; k < _dimensionZ; k++)
+                {
+                    Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale);
+                    float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
+                    float valor = valorPerlin * _dimensionY - (float)j;
+                    yield return new Dato(posicion, valor);
+                }
+
+        /*_desfase += _velocidad;
+        float noiseScale = 0.05f;
         for (int i = 0; i < _dimensionX; i++)
             for (int j = 0; j < _dimensionY; j++)
                 for (int k = 0; k < _dimensionZ; k++)
@@ -46,7 +63,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
                     Vector3Int posicion = new Vector3Int(i, j, k);
                     float valor = PerlinNoise3D(i * noiseScale + _desfase, j * noiseScale, k * noiseScale);
                     yield return new Dato(posicion, valor);
-                }
+                }*/
     }
 
     public static float PerlinNoise3D(float x, float y, float z)
