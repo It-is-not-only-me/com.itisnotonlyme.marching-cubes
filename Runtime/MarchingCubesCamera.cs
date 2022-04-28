@@ -19,6 +19,18 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private Vector3Int _dimensiones;
         private Material _material;
 
+        private struct DatoShader
+        {
+            public Vector3 Posicion;
+            public float Valor;
+
+            public DatoShader(Vector3 posicion, float valor)
+            {
+                Posicion = posicion;
+                Valor = valor;
+            }
+        }
+
         private void Awake()
         {
             _material = new Material(_geometryShader);
@@ -73,12 +85,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int cantidadDeDatos = 1;
             for (int i = 0; i < 3; i++)
                 cantidadDeDatos *= _dimensiones[i];
-            Dato[] datos = new Dato[cantidadDeDatos];
+            DatoShader[] datos = new DatoShader[cantidadDeDatos];
 
             int j = 0;
             foreach (Dato dato in _datos.GetDatos())
             {
-                datos[j] = dato;
+                datos[j].Posicion = dato.Posicion;
+                datos[j].Valor = dato.Valor;
                 j++;
             }
 

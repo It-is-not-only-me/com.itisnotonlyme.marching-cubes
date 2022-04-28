@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 using ItIsNotOnlyMe.MarchingCubes;
 
 [CreateAssetMenu(fileName = "Perlin noise", menuName = "Ejemplo marching cubes/Perlin noise")]
@@ -16,6 +17,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     private Vector3Int _dimension;
     private bool _creado = false;
     private float _desfase = 0f;
+    private IObjectPool<Dato> _poolDatos;
 
     public Vector3Int Dimension
     {
@@ -33,6 +35,15 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     private void OnEnable()
     {
         _creado = false;
+        _poolDatos = new ObjectPool<Dato>(
+        () =>
+        {
+            return new Dato();
+        },
+        collectionCheck: false,
+        defaultCapacity: (int) (_dimensionX * _dimensionY * _dimensionZ),
+        maxSize: (int) (_dimensionX * _dimensionY * _dimensionZ)
+        );
     }
 
     public override Vector3Int GetDimensiones()
@@ -51,19 +62,10 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
                     Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale);
                     float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
                     float valor = valorPerlin * _dimensionY - (float)j;
-                    yield return new Dato(posicion, valor);
+                    Dato dato = _poolDatos.Get();
+                    dato.CargarDatos(posicion, valor);
+                    yield return dato;
                 }
-
-        /*_desfase += _velocidad;
-        float noiseScale = 0.05f;
-        for (int i = 0; i < _dimensionX; i++)
-            for (int j = 0; j < _dimensionY; j++)
-                for (int k = 0; k < _dimensionZ; k++)
-                {
-                    Vector3Int posicion = new Vector3Int(i, j, k);
-                    float valor = PerlinNoise3D(i * noiseScale + _desfase, j * noiseScale, k * noiseScale);
-                    yield return new Dato(posicion, valor);
-                }*/
     }
 
     public static float PerlinNoise3D(float x, float y, float z)
