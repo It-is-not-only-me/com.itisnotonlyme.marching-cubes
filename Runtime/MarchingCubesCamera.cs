@@ -19,6 +19,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private Vector3Int _dimensiones;
         private Material _material;
 
+        private DatoShader[] _datosIngresados;
+        private int _cantDatos;
+
         private struct DatoShader
         {
             public Vector3 Posicion;
@@ -34,6 +37,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void Awake()
         {
             _material = new Material(_geometryShader);
+            _cantDatos = -1;
 
             _dimensiones = _datos.GetDimensiones();
             bool sePudoCrear = CrearBuffers();
@@ -85,19 +89,24 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int cantidadDeDatos = 1;
             for (int i = 0; i < 3; i++)
                 cantidadDeDatos *= _dimensiones[i];
-            DatoShader[] datos = new DatoShader[cantidadDeDatos];
+
+            if (_cantDatos != cantidadDeDatos)
+            {
+                _datosIngresados = new DatoShader[cantidadDeDatos];
+                _cantDatos = cantidadDeDatos;
+            }
 
             int j = 0;
             foreach (Dato dato in _datos.GetDatos())
             {
-                datos[j].Posicion = dato.Posicion;
-                datos[j].Valor = dato.Valor;
+                _datosIngresados[j].Posicion = dato.Posicion;
+                _datosIngresados[j].Valor = dato.Valor;
                 j++;
             }
 
             _datosBuffer.SetCounterValue(0);
             _triangulosBuffer.SetCounterValue(0);
-            _datosBuffer.SetData(datos);
+            _datosBuffer.SetData(_datosIngresados);
         }
 
         private void Dispatch()
