@@ -2,19 +2,15 @@
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
-    public class Dato
+    public struct Dato
     {
         public Vector3 Posicion;
         public float Valor;
 
         public Dato(Vector3 posicion, float valor)
         {
-            CargarDatos(posicion, valor);
-        }
-
-        public Dato()
-            : this(Vector3.zero, 0)
-        {
+            Posicion = posicion;
+            Valor = valor;
         }
 
         public void CargarDatos(Vector3 posicion, float valor)

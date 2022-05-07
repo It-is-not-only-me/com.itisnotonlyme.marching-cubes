@@ -17,7 +17,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     private Vector3Int _dimension;
     private bool _creado = false;
     private float _desfase = 0f;
-    private IObjectPool<Dato> _poolDatos;
+    private Dato[] _datos;
 
     public Vector3Int Dimension
     {
@@ -32,18 +32,18 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
         }
     }
 
+    public int Cantidad
+    {
+        get
+        {
+            return (int)_dimensionX * (int)_dimensionY * (int)_dimensionZ;
+        }
+    }
+
     private void OnEnable()
     {
         _creado = false;
-        _poolDatos = new ObjectPool<Dato>(
-        () =>
-        {
-            return new Dato();
-        },
-        collectionCheck: false,
-        defaultCapacity: (int) (_dimensionX * _dimensionY * _dimensionZ),
-        maxSize: (int) (_dimensionX * _dimensionY * _dimensionZ)
-        );
+        _datos = new Dato[Cantidad];
     }
 
     public override Vector3Int GetDimensiones()
@@ -62,7 +62,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
                     Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale);
                     float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
                     float valor = valorPerlin * _dimensionY - (float)j;
-                    Dato dato = _poolDatos.Get();
+                    Dato dato = _datos[k + j * _dimensionZ + i * _dimensionZ * _dimensionY];
                     dato.CargarDatos(posicion, valor);
                     yield return dato;
                 }

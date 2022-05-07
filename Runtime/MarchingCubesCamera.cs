@@ -19,20 +19,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private Vector3Int _dimensiones;
         private Material _material;
 
-        private DatoShader[] _datosIngresados;
+        private Dato[] _datosIngresados;
         private int _cantDatos;
-
-        private struct DatoShader
-        {
-            public Vector3 Posicion;
-            public float Valor;
-
-            public DatoShader(Vector3 posicion, float valor)
-            {
-                Posicion = posicion;
-                Valor = valor;
-            }
-        }
 
         private void Awake()
         {
@@ -92,7 +80,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             if (_cantDatos != cantidadDeDatos)
             {
-                _datosIngresados = new DatoShader[cantidadDeDatos];
+                _datosIngresados = new Dato[cantidadDeDatos];
                 _cantDatos = cantidadDeDatos;
             }
 
