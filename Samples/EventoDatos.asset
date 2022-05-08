@@ -9,13 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62bad393c2568d34b8b8a22bc10c03b0, type: 3}
-  m_Name: Perlin noise
+  m_Script: {fileID: 11500000, guid: 4498db66ee96c014cbeda065c3bbf6b5, type: 3}
+  m_Name: EventoDatos
   m_EditorClassIdentifier: 
-  _dimensionX: 10
-  _dimensionY: 10
-  _dimensionZ: 10
-  _scale: 1
-  _corrimiento: {x: 0, y: 0, z: 0}
-  _velocidad: 0.01
-  _noiseScale: 0.1

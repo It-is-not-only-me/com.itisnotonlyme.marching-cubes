@@ -8,6 +8,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
 {
     [SerializeField] private uint _dimensionX, _dimensionY, _dimensionZ;
     [SerializeField] private float _scale;
+    [SerializeField] private Vector3 _corrimiento;
 
     [Space]
 
@@ -19,7 +20,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     private float _desfase = 0f;
     private Dato[] _datos;
 
-    public Vector3Int Dimension
+    public override Vector3Int Dimension
     {
         get
         {
@@ -32,7 +33,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
         }
     }
 
-    public int Cantidad
+    public override int Cantidad
     {
         get
         {
@@ -46,11 +47,6 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
         _datos = new Dato[Cantidad];
     }
 
-    public override Vector3Int GetDimensiones()
-    {
-        return Dimension;
-    }
-
     public override IEnumerable<Dato> GetDatos()
     {
         _desfase += _velocidad;
@@ -59,7 +55,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
             for (int j = 0; j < _dimensionY; j++)
                 for (int k = 0; k < _dimensionZ; k++)
                 {
-                    Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale);
+                    Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale) + _corrimiento;
                     float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
                     float valor = valorPerlin * _dimensionY - (float)j;
                     Dato dato = _datos[k + j * _dimensionZ + i * _dimensionZ * _dimensionY];

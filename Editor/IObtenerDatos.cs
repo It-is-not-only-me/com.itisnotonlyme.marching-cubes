@@ -5,7 +5,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
     public interface IObtenerDatos
     {
-        public Vector3Int GetDimensiones();
+        public Vector3Int Dimension { get; }
+
+        public int Cantidad { get; }
 
         public IEnumerable<Dato> GetDatos();
     }
