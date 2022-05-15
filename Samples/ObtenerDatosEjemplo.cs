@@ -18,37 +18,30 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     private Vector3Int _dimension;
     private bool _creado = false;
     private float _desfase = 0f;
-    private Dato[] _datos;
 
     public override Vector3Int Dimension
     {
-        get
-        {
-            if (!_creado)
-            {
-                _dimension = new Vector3Int((int)_dimensionX, (int)_dimensionY, (int)_dimensionZ);
-                _creado = true;
-            }
-            return _dimension;
-        }
+        get => new Vector3Int((int)_dimensionX, (int)_dimensionY, (int)_dimensionZ);
     }
 
     public override int Cantidad
     {
-        get
-        {
-            return (int)_dimensionX * (int)_dimensionY * (int)_dimensionZ;
-        }
+        get => (int)_dimensionX * (int)_dimensionY * (int)_dimensionZ;
+    }
+
+    public override int Id
+    {
+        get => GetInstanceID();
     }
 
     private void OnEnable()
     {
         _creado = false;
-        _datos = new Dato[Cantidad];
     }
 
     public override IEnumerable<Dato> GetDatos()
     {
+        Dato dato = new Dato(Vector3.zero, 0);
         _desfase += _velocidad;
         float noiseScale = 0.05f;
         for (int i = 0; i < _dimensionX; i++)
@@ -57,8 +50,7 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
                 {
                     Vector3 posicion = new Vector3(i * _scale, j * _scale, k * _scale) + _corrimiento;
                     float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
-                    float valor = valorPerlin * _dimensionY - (float)j;
-                    Dato dato = _datos[k + j * _dimensionZ + i * _dimensionZ * _dimensionY];
+                    float valor = valorPerlin * _dimensionY - j;
                     dato.CargarDatos(posicion, valor);
                     yield return dato;
                 }

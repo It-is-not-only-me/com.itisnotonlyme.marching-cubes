@@ -9,6 +9,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         public int Cantidad { get; }
 
+        public int Id { get; }
+
         public IEnumerable<Dato> GetDatos();
     }
 }

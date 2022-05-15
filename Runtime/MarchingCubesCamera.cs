@@ -19,7 +19,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosEventoSO _obtenerDatosEvento;
 
         private Material _material;
-        private ComputeBuffer _triangulosBuffer, _datosBuffer, _argBuffer;
+        private ComputeBuffer _triangulosBuffer, _argBuffer;
+        private Dictionary<int, ComputeBuffer> _datosBufferDiccionario;
         private int _triangulos;
         private List<IObtenerDatos> _datos;
 
@@ -28,6 +29,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             _material = new Material(_geometryShader);
             _datos = new List<IObtenerDatos>();
+            _datosBufferDiccionario = new Dictionary<int, ComputeBuffer>();
             CrearArgBuffer();
             _triangulos = -1;
         }
@@ -64,7 +66,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datos.ForEach(dato => datosTotales += dato.Cantidad);
             if (datosTotales < 8)
                 return;
-            //_datosBuffer.SetData(_datosIngresados);
 
             // 5 es la cantidad de triangulos maximos que va a tener un cube segun el algoritmo
             int triangulosCount = datosTotales * 5;
@@ -86,7 +87,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
             {
                 int datosCount = datos.Cantidad;
                 int datosStride = 4 * sizeof(float);
-                _datosBuffer = new ComputeBuffer(datosCount, datosStride);
+                ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
+                datosBuffer.SetCounterValue(0);
 
                 Dato[] datosObtenidos = new Dato[datosCount];
                 int contador = 0;
@@ -95,19 +97,43 @@ namespace ItIsNotOnlyMe.MarchingCubes
                     datosObtenidos[contador] = dato;
                     contador++;
                 }
-                _datosBuffer.SetData(datosObtenidos);
-                Dispatch(datos);
-                _datosBuffer.Dispose();
+                datosBuffer.SetData(datosObtenidos);
+                Dispatch(datos, datosBuffer);
             }
         }
 
-        private void Dispatch(IObtenerDatos datos)
+        ComputeBuffer ObtenerDatosBuffer(int id, int cantidad, int stride)
+        {
+            ComputeBuffer datos;
+
+            if (!_datosBufferDiccionario.ContainsKey(id))
+            {
+                datos = new ComputeBuffer(cantidad, stride);
+                _datosBufferDiccionario.Add(id, datos);
+            }
+            else
+            {
+                datos = _datosBufferDiccionario[id];
+            }
+
+
+            if (datos.count != cantidad)
+            {
+                datos.Dispose();
+                _datosBufferDiccionario[id] = new ComputeBuffer(cantidad, stride);
+                datos = _datosBufferDiccionario[id];
+            }
+
+            return datos;
+        }
+
+        private void Dispatch(IObtenerDatos datos, ComputeBuffer datosBuffer)
         {
             int kernel = _computeShader.FindKernel("March");
             Vector3Int dimension = datos.Dimension;
 
             _computeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
-            _computeShader.SetBuffer(kernel, "datos", _datosBuffer);
+            _computeShader.SetBuffer(kernel, "datos", datosBuffer);
             _computeShader.SetFloat("isoLevel", _isoLevel);
             _computeShader.SetInts("numPointsPerAxis", dimension.x, dimension.y, dimension.z);
 
@@ -124,15 +150,14 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _material.SetPass(0);
             _material.SetBuffer("triangulos", _triangulosBuffer);
             Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
-
-            //_datosBuffer.SetCounterValue(0);
-            //_triangulosBuffer.SetCounterValue(0);
         }
 
         private void DestruirBuffers()
         {
+            foreach (KeyValuePair<int, ComputeBuffer> par in _datosBufferDiccionario)
+                (par.Value).Dispose();
+
             _triangulosBuffer.Dispose();
-            //_datosBuffer.Dispose();
             _argBuffer.Dispose();
         }
     }
