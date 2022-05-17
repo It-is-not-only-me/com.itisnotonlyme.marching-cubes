@@ -356,6 +356,8 @@ MonoBehaviour:
     MandarDatos: 1
   - Dato: {fileID: 11400000, guid: b2f922fe5950d6c43a9bfc766534af28, type: 2}
     MandarDatos: 1
+  - Dato: {fileID: 11400000, guid: a18124b6ce878f840b580f22b72302e2, type: 2}
+    MandarDatos: 1
 --- !u!4 &1222820766
 Transform:
   m_ObjectHideFlags: 0
