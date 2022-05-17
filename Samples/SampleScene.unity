@@ -318,6 +318,8 @@ MonoBehaviour:
   _geometryShader: {fileID: 4800000, guid: 4a09d4b68d326984093b12759191ac9c, type: 3}
   _isoLevel: 0.477
   _obtenerDatosEvento: {fileID: 11400000, guid: 68c8717afaa70654f8601faab20b4cad, type: 2}
+  _sacarDatosEvento: {fileID: 0}
+  _actualizarDatosEvento: {fileID: 11400000, guid: eee38516174fda94f97cb88b0d778b03, type: 2}
 --- !u!1 &1222820764
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,10 +349,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f21eeb35a5cfa4785eaef0f93db397, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _evento: {fileID: 11400000, guid: 68c8717afaa70654f8601faab20b4cad, type: 2}
+  _eventoMandar: {fileID: 11400000, guid: 68c8717afaa70654f8601faab20b4cad, type: 2}
+  _actualizarDatos: {fileID: 11400000, guid: eee38516174fda94f97cb88b0d778b03, type: 2}
   _datos:
-  - {fileID: 11400000, guid: b2f922fe5950d6c43a9bfc766534af28, type: 2}
-  - {fileID: 11400000, guid: ff635073eeb89a146b28177cea9891eb, type: 2}
+  - Dato: {fileID: 11400000, guid: ff635073eeb89a146b28177cea9891eb, type: 2}
+    MandarDatos: 1
+  - Dato: {fileID: 11400000, guid: b2f922fe5950d6c43a9bfc766534af28, type: 2}
+    MandarDatos: 1
 --- !u!4 &1222820766
 Transform:
   m_ObjectHideFlags: 0

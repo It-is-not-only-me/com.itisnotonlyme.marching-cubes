@@ -16,7 +16,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         [Space]
 
-        [SerializeField] private DatosEventoSO _obtenerDatosEvento;
+        [SerializeField] private DatosEventoSO _obtenerDatosEvento, _sacarDatosEvento, _actualizarDatosEvento;
 
         private Material _material;
         private ComputeBuffer _triangulosBuffer, _argBuffer;
@@ -34,16 +34,35 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _triangulos = -1;
         }
 
-        private void OnEnable() => _obtenerDatosEvento.ObtenerDatosEvento += RecibirDatos;
-        private void OnDisable() => _obtenerDatosEvento.ObtenerDatosEvento -= RecibirDatos;
+        private void OnEnable()
+        {
+            if (_obtenerDatosEvento != null)
+                _obtenerDatosEvento.ObtenerDatosEvento += RecibirDatos;
+            
+            if (_sacarDatosEvento != null)
+                _sacarDatosEvento.ObtenerDatosEvento += EliminarDatos;
+            
+            if (_actualizarDatosEvento != null)
+                _actualizarDatosEvento.ObtenerDatosEvento += ActualizarDatos;
+        } 
+
+        private void OnDisable()
+        {
+            if (_obtenerDatosEvento != null)
+                _obtenerDatosEvento.ObtenerDatosEvento -= RecibirDatos;
+
+            if (_sacarDatosEvento != null)
+                _sacarDatosEvento.ObtenerDatosEvento -= EliminarDatos;
+
+            if (_actualizarDatosEvento != null)
+                _actualizarDatosEvento.ObtenerDatosEvento -= ActualizarDatos;
+        } 
 
         private void OnRenderObject()
         {
             ConfigurarBuffers();
 
             Render();
-
-            _datos.Clear();
         }
 
         private void OnDestroy() => DestruirBuffers();
@@ -58,6 +77,28 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void RecibirDatos(IObtenerDatos datos)
         {
             _datos.Add(datos);
+        }
+
+        private void EliminarDatos(IObtenerDatos datos)
+        {
+            _datos.Remove(datos);
+        }
+
+        private void ActualizarDatos(IObtenerDatos datos)
+        {
+            int datosCount = datos.Cantidad;
+            int datosStride = 4 * sizeof(float);
+            ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
+            datosBuffer.SetCounterValue(0);
+
+            Dato[] datosObtenidos = new Dato[datosCount];
+            int contador = 0;
+            foreach (Dato dato in datos.GetDatos())
+            {
+                datosObtenidos[contador] = dato;
+                contador++;
+            }
+            datosBuffer.SetData(datosObtenidos);
         }
 
         private void ConfigurarBuffers()
@@ -88,16 +129,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 int datosCount = datos.Cantidad;
                 int datosStride = 4 * sizeof(float);
                 ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
-                datosBuffer.SetCounterValue(0);
-
-                Dato[] datosObtenidos = new Dato[datosCount];
-                int contador = 0;
-                foreach (Dato dato in datos.GetDatos())
-                {
-                    datosObtenidos[contador] = dato;
-                    contador++;
-                }
-                datosBuffer.SetData(datosObtenidos);
                 Dispatch(datos, datosBuffer);
             }
         }
