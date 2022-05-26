@@ -9,7 +9,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private List<IObtenerDatos> _datos;
         private Dictionary<int, InfoBuffer> _datosDiccionario;
 
-        private ComputeBuffer _triangulosBuffer;
+        private ComputeBuffer _triangulosBuffer, _argsBuffer;
         private int _cantidadTriangulos;
 
         private ComputeShader _computeShader;
@@ -19,13 +19,30 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             public ComputeBuffer DatosBuffer;
             public int Index;
-            public bool Actualizado;
+            public bool NecesitaActualizar;
 
             public InfoBuffer(ComputeBuffer datosBuffer, int index = -1, bool actualizado = true)
             {
                 DatosBuffer = datosBuffer;
                 Index = index;
-                Actualizado = actualizado;
+                NecesitaActualizar = actualizado;
+            }
+        }
+
+        private class OrdenarDatos : IComparer<IObtenerDatos>
+        {
+            private Dictionary<int, InfoBuffer> _datosDiccionario;
+
+            public OrdenarDatos(Dictionary<int, InfoBuffer> datosDiccionario)
+            {
+                _datosDiccionario = datosDiccionario;
+            }
+
+            public int Compare(IObtenerDatos x, IObtenerDatos y)
+            {
+                if (!_datosDiccionario[x.Id].NecesitaActualizar)
+                    return -1;
+                return 1;
             }
         }
 
@@ -36,6 +53,12 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             _computeShader = computeSahder;
             _isoLevel = isoLevel;
+
+            int argCount = 4;
+            int argStride = sizeof(int);
+            _argsBuffer = new ComputeBuffer(argCount, argStride, ComputeBufferType.IndirectArguments);
+
+            _cantidadTriangulos = -1;
         }
 
         public void AgregarDatos(IObtenerDatos datos)
@@ -47,8 +70,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             int datosCount = datos.Cantidad;
             int datosStride = 4 * sizeof(float);
-            ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
-            datosBuffer.SetCounterValue(0);
+            InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
+            infoBuffer.DatosBuffer.SetCounterValue(0);
             Dato[] datosObtenidos = new Dato[datosCount];
             int contador = 0;
             foreach (Dato dato in datos.GetDatos())
@@ -56,8 +79,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 datosObtenidos[contador] = dato;
                 contador++;
             }
-            datosBuffer.SetData(datosObtenidos);
-            // poner en actualizar estos datos
+            infoBuffer.DatosBuffer.SetData(datosObtenidos);
+            infoBuffer.NecesitaActualizar = true;
+            _datosDiccionario[datos.Id] = infoBuffer;
         }
 
         public void SacarDatos(IObtenerDatos datos)
@@ -81,35 +105,24 @@ namespace ItIsNotOnlyMe.MarchingCubes
             Orden(out inicio, out index);
             
             _triangulosBuffer = TriangulosBuffer(index, ref inicio, triangulosCount, triangulosStride);
-            
-            // ordenar
-            _datos.Sort(inicio, _datos.Count, (x, y) => 
-                        {
-                            if (!_datosDiccionario[x.Id].Actualizado)
-                                return -1;
-                            if (!_datosDiccionario[y.Id].Actualizado)
-                                return 1;
-                        });
+
+            _datos.Sort(inicio, _datos.Count - inicio, new OrdenarDatos(_datosDiccionario));
             
             for (int i = inicio; i < _datos.Count; i++) 
             {
-                
-            }
-
-            
-                        
-            foreach (IObtenerDatos datos in _datos)
-            {
+                IObtenerDatos datos = _datos[i];
                 int datosCount = datos.Cantidad;
                 int datosStride = 4 * sizeof(float);
-                ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
-                Dispatch(datos, datosBuffer);
+                InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
+                infoBuffer.Index = Dispatch(datos, infoBuffer.DatosBuffer);
+                infoBuffer.NecesitaActualizar = false;
+                _datosDiccionario[datos.Id] = infoBuffer;
             }
         }
         
         private ComputeBuffer TriangulosBuffer(int indexInicio, ref int orden, int cantidad, int stride) 
         {
-            if (cantidad < _cantidadTriangulos)
+            if (_cantidadTriangulos < cantidad)
             {
                 // ver si tengo que copiarlo y guardarlo en el nuevo buffer
                 if (_triangulosBuffer != null)
@@ -126,7 +139,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             return _triangulosBuffer;
         }
 
-        private void Dispatch(IObtenerDatos datos, ComputeBuffer datosBuffer)
+        private int Dispatch(IObtenerDatos datos, ComputeBuffer datosBuffer)
         {
             int kernel = _computeShader.FindKernel("March");
             Vector3Int dimension = datos.Dimension;
@@ -137,6 +150,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _computeShader.SetInts("numPointsPerAxis", dimension.x, dimension.y, dimension.z);
 
             _computeShader.Dispatch(kernel, dimension.x, dimension.y, dimension.z);
+
+            int[] args = new int[] { 0, 1, 0, 0 };
+            _argsBuffer.SetData(args);
+            ComputeBuffer.CopyCount(_triangulosBuffer, _argsBuffer, 0);
+            _argsBuffer.GetData(args);
+
+            return args[0];
         }
 
         public ComputeBuffer Triangulos()
@@ -144,22 +164,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
             return _triangulosBuffer;
         }
 
-        public void DestruirBuffer()
-        {
-            foreach (KeyValuePair<int, InfoBuffer> par in _datosDiccionario)
-                (par.Value.DatosBuffer).Dispose();
-            _triangulosBuffer.Dispose();
-        }
-
         private void Orden(out int inicio, out int index)
         {
             inicio = 0;
             index = 0;
             
-            for (IObtenerDatos datos in _datos)
+            foreach (IObtenerDatos datos in _datos)
             {
                 InfoBuffer infoBuffer = _datosDiccionario[datos.Id];
-                if (!infoBuffer.Actualizado)
+                if (!infoBuffer.NecesitaActualizar)
                 {
                     inicio++;
                     index = infoBuffer.Index;
@@ -171,32 +184,37 @@ namespace ItIsNotOnlyMe.MarchingCubes
             }                
         }
 
-        private ComputeBuffer ObtenerDatosBuffer(int id, int cantidad, int stride)
+        private InfoBuffer ObtenerInfoBuffer(int id, int cantidad, int stride)
         {
-            ComputeBuffer datos;
+            InfoBuffer infoBuffer;
 
             if (!_datosDiccionario.ContainsKey(id))
             {
-                datos = new ComputeBuffer(cantidad, stride);
-                InfoBuffer nuevoInfoBuffer = new InfoBuffer(datos);
-                _datosDiccionario.Add(id, nuevoInfoBuffer);
+                infoBuffer = new InfoBuffer(new ComputeBuffer(cantidad, stride));
+                _datosDiccionario.Add(id, infoBuffer);
             }
             else
             {
-                datos = _datosDiccionario[id].DatosBuffer;
+                infoBuffer = _datosDiccionario[id];
             }
 
-
-            if (datos.count != cantidad)
+            ComputeBuffer buffer = infoBuffer.DatosBuffer;
+            if (buffer.count != cantidad)
             {
-                datos.Dispose();
-                InfoBuffer nuevoInfoBuffer = _datosDiccionario[id];
-                nuevoInfoBuffer.DatosBuffer = new ComputeBuffer(cantidad, stride);
-                _datosDiccionario[id] = nuevoInfoBuffer;
-                datos = nuevoInfoBuffer.DatosBuffer;
+                buffer.Dispose();
+                infoBuffer.DatosBuffer = new ComputeBuffer(cantidad, stride);
+                _datosDiccionario[id] = infoBuffer;
             }
 
-            return datos;
+            return infoBuffer;
+        }
+
+        public void DestruirBuffer()
+        {
+            foreach (KeyValuePair<int, InfoBuffer> par in _datosDiccionario)
+                (par.Value.DatosBuffer).Dispose();
+            _triangulosBuffer.Dispose();
+            _argsBuffer.Dispose();
         }
     }
 }
