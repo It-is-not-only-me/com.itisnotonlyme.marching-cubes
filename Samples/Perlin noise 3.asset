@@ -15,7 +15,7 @@ MonoBehaviour:
   _dimensionX: 20
   _dimensionY: 20
   _dimensionZ: 20
-  _scale: 1
+  _scale: 0.5
   _corrimiento: {x: -20, y: 0, z: 0}
   _velocidad: 0.01
   _noiseScale: 0.1
