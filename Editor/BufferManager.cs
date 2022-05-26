@@ -1,0 +1,159 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ItIsNotOnlyMe.MarchingCubes
+{    
+    public class BufferManager
+    {
+        private List<IObtenerDatos> _datos;
+        private Dictionary<int, InfoBuffer> _datosDiccionario;
+
+        private ComputeBuffer _triangulosBuffer;
+        private int _cantidadTriangulos;
+
+        private ComputeShader _computeShader;
+        private float _isoLevel;
+
+        private struct InfoBuffer
+        {
+            public ComputeBuffer DatosBuffer;
+            public int Index;
+            public bool Actualizado;
+
+            public InfoBuffer(ComputeBuffer datosBuffer, int index = -1, bool actualizado = true)
+            {
+                DatosBuffer = datosBuffer;
+                Index = index;
+                Actualizado = actualizado;
+            }
+        }
+
+        public BufferManager(ComputeShader computeSahder, float isoLevel)
+        {
+            _datos = new List<IObtenerDatos>();
+            _datosDiccionario = new Dictionary<int, InfoBuffer>();
+
+            _computeShader = computeSahder;
+            _isoLevel = isoLevel;
+        }
+
+        public void AgregarDatos(IObtenerDatos datos)
+        {
+            _datos.Add(datos);
+        }
+
+        public void ActualizarDatos(IObtenerDatos datos)
+        {
+            int datosCount = datos.Cantidad;
+            int datosStride = 4 * sizeof(float);
+            ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
+            datosBuffer.SetCounterValue(0);
+            Dato[] datosObtenidos = new Dato[datosCount];
+            int contador = 0;
+            foreach (Dato dato in datos.GetDatos())
+            {
+                datosObtenidos[contador] = dato;
+                contador++;
+            }
+
+            datosBuffer.SetData(datosObtenidos);
+        }
+
+        public void SacarDatos(IObtenerDatos datos)
+        {
+            _datos.Remove(datos);
+        }
+
+        // configurar esto para hacer que tenga todo ordenado bien y optimizar todo
+        public void ConfigurarBuffer()
+        {
+            int datosTotales = 0;
+            _datos.ForEach(dato => datosTotales += dato.Cantidad);
+            if (datosTotales < 8)
+                return;
+
+            // 5 es la cantidad de triangulos maximos que va a tener un cube segun el algoritmo
+            int triangulosCount = datosTotales * 5;
+            int trianguloStride = 3 * (3 * sizeof(float));
+
+            if (_cantidadTriangulos != triangulosCount)
+            {
+                if (_triangulosBuffer != null)
+                    _triangulosBuffer.Dispose();
+                _triangulosBuffer = new ComputeBuffer(triangulosCount, trianguloStride, ComputeBufferType.Append);
+                _cantidadTriangulos = triangulosCount;
+            }
+            else
+            {
+                _triangulosBuffer.SetCounterValue((uint)Inicio());
+            }
+
+            foreach (IObtenerDatos datos in _datos)
+            {
+                int datosCount = datos.Cantidad;
+                int datosStride = 4 * sizeof(float);
+                ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
+                Dispatch(datos, datosBuffer);
+            }
+        }
+
+        private void Dispatch(IObtenerDatos datos, ComputeBuffer datosBuffer)
+        {
+            int kernel = _computeShader.FindKernel("March");
+            Vector3Int dimension = datos.Dimension;
+
+            _computeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
+            _computeShader.SetBuffer(kernel, "datos", datosBuffer);
+            _computeShader.SetFloat("isoLevel", _isoLevel);
+            _computeShader.SetInts("numPointsPerAxis", dimension.x, dimension.y, dimension.z);
+
+            _computeShader.Dispatch(kernel, dimension.x, dimension.y, dimension.z);
+        }
+
+        public ComputeBuffer Triangulos()
+        {
+            return _triangulosBuffer;
+        }
+
+        public void DestruirBuffer()
+        {
+            foreach (KeyValuePair<int, InfoBuffer> par in _datosDiccionario)
+                (par.Value.DatosBuffer).Dispose();
+            _triangulosBuffer.Dispose();
+        }
+
+        private int Inicio()
+        {
+            return 0;
+        }
+
+        private ComputeBuffer ObtenerDatosBuffer(int id, int cantidad, int stride)
+        {
+            ComputeBuffer datos;
+
+            if (!_datosDiccionario.ContainsKey(id))
+            {
+                datos = new ComputeBuffer(cantidad, stride);
+                InfoBuffer nuevoInfoBuffer = new InfoBuffer(datos);
+                _datosDiccionario.Add(id, nuevoInfoBuffer);
+            }
+            else
+            {
+                datos = _datosDiccionario[id].DatosBuffer;
+            }
+
+
+            if (datos.count != cantidad)
+            {
+                datos.Dispose();
+                InfoBuffer nuevoInfoBuffer = _datosDiccionario[id];
+                nuevoInfoBuffer.DatosBuffer = new ComputeBuffer(cantidad, stride);
+                _datosDiccionario[id] = nuevoInfoBuffer;
+                datos = nuevoInfoBuffer.DatosBuffer;
+            }
+
+            return datos;
+        }
+    }
+}
