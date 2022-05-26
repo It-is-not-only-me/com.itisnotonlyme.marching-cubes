@@ -56,8 +56,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 datosObtenidos[contador] = dato;
                 contador++;
             }
-
             datosBuffer.SetData(datosObtenidos);
+            // poner en actualizar estos datos
         }
 
         public void SacarDatos(IObtenerDatos datos)
@@ -75,20 +75,29 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             // 5 es la cantidad de triangulos maximos que va a tener un cube segun el algoritmo
             int triangulosCount = datosTotales * 5;
-            int trianguloStride = 3 * (3 * sizeof(float));
+            int triangulosStride = 3 * (3 * sizeof(float));
 
-            if (_cantidadTriangulos != triangulosCount)
+            int inicio = 0, index = 0;
+            Orden(out inicio, out index);
+            
+            _triangulosBuffer = TriangulosBuffer(index, ref inicio, triangulosCount, triangulosStride);
+            
+            // ordenar
+            _datos.Sort(inicio, _datos.Count, (x, y) => 
+                        {
+                            if (!_datosDiccionario[x.Id].Actualizado)
+                                return -1;
+                            if (!_datosDiccionario[y.Id].Actualizado)
+                                return 1;
+                        });
+            
+            for (int i = inicio; i < _datos.Count; i++) 
             {
-                if (_triangulosBuffer != null)
-                    _triangulosBuffer.Dispose();
-                _triangulosBuffer = new ComputeBuffer(triangulosCount, trianguloStride, ComputeBufferType.Append);
-                _cantidadTriangulos = triangulosCount;
-            }
-            else
-            {
-                _triangulosBuffer.SetCounterValue((uint)Inicio());
+                
             }
 
+            
+                        
             foreach (IObtenerDatos datos in _datos)
             {
                 int datosCount = datos.Cantidad;
@@ -96,6 +105,25 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 ComputeBuffer datosBuffer = ObtenerDatosBuffer(datos.Id, datosCount, datosStride);
                 Dispatch(datos, datosBuffer);
             }
+        }
+        
+        private ComputeBuffer TriangulosBuffer(int indexInicio, ref int orden, int cantidad, int stride) 
+        {
+            if (cantidad < _cantidadTriangulos)
+            {
+                // ver si tengo que copiarlo y guardarlo en el nuevo buffer
+                if (_triangulosBuffer != null)
+                    _triangulosBuffer.Dispose();
+                _triangulosBuffer = new ComputeBuffer(cantidad, stride, ComputeBufferType.Append);
+                _cantidadTriangulos = cantidad;
+                orden = 0;
+            }
+            else
+            {
+                _triangulosBuffer.SetCounterValue((uint)indexInicio);
+            }
+            
+            return _triangulosBuffer;
         }
 
         private void Dispatch(IObtenerDatos datos, ComputeBuffer datosBuffer)
@@ -123,9 +151,24 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _triangulosBuffer.Dispose();
         }
 
-        private int Inicio()
+        private void Orden(out int inicio, out int index)
         {
-            return 0;
+            inicio = 0;
+            index = 0;
+            
+            for (IObtenerDatos datos in _datos)
+            {
+                InfoBuffer infoBuffer = _datosDiccionario[datos.Id];
+                if (!infoBuffer.Actualizado)
+                {
+                    inicio++;
+                    index = infoBuffer.Index;
+                }
+                else
+                {
+                    break;
+                }
+            }                
         }
 
         private ComputeBuffer ObtenerDatosBuffer(int id, int cantidad, int stride)
