@@ -26,7 +26,7 @@ public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
                 {
                     Vector3 posicion = new Vector3(i, j, k) * _lod + transform.position;
                     float valorPerlin = Mathf.PerlinNoise(posicion.x * noiseScale, posicion.z * noiseScale);
-                    float valor = valorPerlin * 5 - j;
+                    float valor = valorPerlin * 5 - j + Dimension.y / 2;
                     dato.CargarDatos(posicion, valor);
                     yield return dato;
                 }
