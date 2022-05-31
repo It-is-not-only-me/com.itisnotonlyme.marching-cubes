@@ -7,11 +7,15 @@ struct Triangle {
     float3 vertexA;
     float3 vertexB;
     float3 vertexC;
+    float2 uv;
+    float4 texcoord;
 };
 
 struct Dato {
     float3 posicion;
     float valor;
+    float2 uv;
+    float4 texcoor;
 };
 
 AppendStructuredBuffer<Triangle> triangles;

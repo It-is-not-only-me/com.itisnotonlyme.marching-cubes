@@ -27,6 +27,8 @@ Shader "MarchingCubes/Render"
                 float3 vertexA;
                 float3 vertexB;
                 float3 vertexC;
+                float2 uv;
+                float4 texcoord;
             };
 
             StructuredBuffer<Triangle> triangulos;
