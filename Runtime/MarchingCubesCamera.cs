@@ -56,6 +56,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void OnRenderObject()
         {
+            _bufferManager.ConfigurarBuffer();
             Render();
         }
 
@@ -85,23 +86,21 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Render()
         {
-            foreach (ComputeBuffer triangulosBuffer in _bufferManager.Triangulos())
-            {
-                int[] args = new int[] { 0, 1, 0, 0 };
-                _argBuffer.SetData(args);
-                ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);
-                _argBuffer.GetData(args);
+            ComputeBuffer triangulosBuffer = _bufferManager.Triangulos();
+            int[] args = new int[] { 0, 1, 0, 0 };
+            _argBuffer.SetData(args);
+            ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);
+            _argBuffer.GetData(args);
 
-                _material.SetPass(0);
-                _material.SetBuffer("triangulos", triangulosBuffer);
-                Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
-            }
+            _material.SetPass(0);
+            _material.SetBuffer("triangulos", triangulosBuffer);
+            Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
         }
 
         private void DestruirBuffers()
         {
             _argBuffer.Dispose();
-            _bufferManager.Destruir();
+            _bufferManager.DestruirBuffer();
         }
     }
 }

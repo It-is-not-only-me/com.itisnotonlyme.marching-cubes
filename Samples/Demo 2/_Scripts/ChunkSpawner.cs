@@ -58,7 +58,7 @@ public class ChunkSpawner : MonoBehaviour
         {
             foreach (InfoChunk infoChunk in InfoChunksSegunLOD(lod))
                 CrearChunk(infoChunk);
-            yield return null;
+            yield return new WaitForSeconds(1);
         }
     }
 

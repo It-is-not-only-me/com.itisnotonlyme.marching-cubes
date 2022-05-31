@@ -16,6 +16,12 @@ public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
     public Vector3Int Dimension => _dimension / _lod;
     public int Id => GetInstanceID();
 
+    private void Start()
+    {
+        if (_agregarChunk != null)
+            _agregarChunk.Invoke(this);
+    }
+
     public IEnumerable<Dato> GetDatos()
     {
         Dato dato = new Dato(Vector3.zero, 0);
@@ -34,23 +40,10 @@ public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
 
     public void Inicializar(Vector3 posicion, Vector3Int dimension, int lod)
     {
-        Agregar();
         _lod = lod;
         transform.position = posicion - dimension;
         _dimension = dimension * 2;
         Actualizar();
-    }
-
-    private void Agregar()
-    {
-        if (_agregarChunk != null)
-            _agregarChunk.Invoke(this);
-    }
-
-    private void Sacar()
-    {
-        if (_sacarChunk != null)
-            _sacarChunk.Invoke(this);
     }
 
     private void Actualizar()
