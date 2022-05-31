@@ -47,5 +47,5 @@ MonoBehaviour:
   _agregarChunk: {fileID: 11400000, guid: cf42097d3db4f134fb14b5bb36621a9e, type: 2}
   _actualizarChunk: {fileID: 11400000, guid: 245f8481ad3264c4890962d11403b6f6, type: 2}
   _sacarChunk: {fileID: 11400000, guid: 3c4393910f49f184bba5a7063840afff, type: 2}
-  _noiceScale: 0.01
+  _noiseScale: 0.05
   _dimension: {x: 20, y: 20, z: 20}

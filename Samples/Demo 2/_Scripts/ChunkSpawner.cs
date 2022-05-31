@@ -64,10 +64,11 @@ public class ChunkSpawner : MonoBehaviour
 
     private int ComponenteMenor(Vector3Int vector)
     {
-        if (vector.x <= vector.y && vector.x <= vector.z)
+        return (vector.x <= vector.z) ? vector.x : vector.z;
+        /*if (vector.x <= vector.y && vector.x <= vector.z)
             return vector.x;
 
-        return (vector.y <= vector.z) ? vector.y : vector.z;
+        return (vector.y <= vector.z) ? vector.y : vector.z;*/
     }
 
     private void CrearChunk(InfoChunk infoChunk)

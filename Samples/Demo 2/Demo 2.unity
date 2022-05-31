@@ -169,8 +169,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _centro: {fileID: 626540240}
   _chunkPrefab: {fileID: 7130194951382817904, guid: 33eabd19e8356254db4c47d36d178548, type: 3}
-  _radio: {x: 50, y: 50, z: 50}
-  _lodRango: 6
+  _radio: {x: 100, y: 20, z: 100}
+  _lodRango: 10
   _distanciaActualizacion: 10
 --- !u!1 &626540239
 GameObject:

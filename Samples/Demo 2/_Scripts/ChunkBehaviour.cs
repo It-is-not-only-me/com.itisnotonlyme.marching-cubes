@@ -6,7 +6,7 @@ using ItIsNotOnlyMe.MarchingCubes;
 public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
 {
     [SerializeField] private DatosEventoSO _agregarChunk, _actualizarChunk, _sacarChunk;
-    [SerializeField] private float _noiceScale;
+    [SerializeField] private float _noiseScale = 0.05f;
 
     [Space]
 
@@ -25,14 +25,15 @@ public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
     public IEnumerable<Dato> GetDatos()
     {
         Dato dato = new Dato(Vector3.zero, 0);
-        float noiseScale = 0.05f;
         for (int i = 0; i < Dimension.x; i++)
             for (int j = 0; j < Dimension.y; j++)
                 for (int k = 0; k < Dimension.z; k++)
                 {
                     Vector3 posicion = new Vector3(i, j, k) * _lod + transform.position;
-                    float valorPerlin = Mathf.PerlinNoise(posicion.x * noiseScale, posicion.z * noiseScale);
+                    float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale, posicion.z * _noiseScale);
                     float valor = valorPerlin * 5 - j + Dimension.y / 2;
+                    //Vector3 posicionNoise = posicion * _noiceScale;
+                    //float valor = PerlinNoise3D(posicionNoise.x, posicionNoise.y, posicionNoise.z);
                     dato.CargarDatos(posicion, valor);
                     yield return dato;
                 }
@@ -50,5 +51,17 @@ public class ChunkBehaviour : MonoBehaviour, IObtenerDatos
     {
         if (_actualizarChunk != null)
             _actualizarChunk.Invoke(this);
+    }
+
+    private float PerlinNoise3D(float x, float y, float z)
+    {
+        float xy = Mathf.PerlinNoise(x, y);
+        float xz = Mathf.PerlinNoise(x, z);
+        float yz = Mathf.PerlinNoise(y, z);
+        float yx = Mathf.PerlinNoise(y, x);
+        float zx = Mathf.PerlinNoise(z, x);
+        float zy = Mathf.PerlinNoise(z, y);
+
+        return (xy + xz + yz + yx + zx + zy) / 6;
     }
 }
