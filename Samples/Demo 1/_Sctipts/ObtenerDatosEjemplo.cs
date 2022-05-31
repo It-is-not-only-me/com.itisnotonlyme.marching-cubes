@@ -24,11 +24,6 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
         get => new Vector3Int((int)_dimensionX, (int)_dimensionY, (int)_dimensionZ);
     }
 
-    public override int Cantidad
-    {
-        get => (int)_dimensionX * (int)_dimensionY * (int)_dimensionZ;
-    }
-
     public override int Id
     {
         get => GetInstanceID();

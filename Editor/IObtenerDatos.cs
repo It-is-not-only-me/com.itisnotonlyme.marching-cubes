@@ -7,8 +7,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
     {
         public Vector3Int Dimension { get; }
 
-        public int Cantidad { get; }
-
         public int Id { get; }
 
         public IEnumerable<Dato> GetDatos();
