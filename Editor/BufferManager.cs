@@ -51,7 +51,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         public void ActualizarDatos(IObtenerDatos datos)
         {
             int datosCount = Cantidad(datos);
-            int datosStride = 4 * sizeof(float);
+            int datosStride = 6 * sizeof(float);
             InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
             infoBuffer.DatosBuffer.SetCounterValue(0);
             Dato[] datosObtenidos = new Dato[datosCount];

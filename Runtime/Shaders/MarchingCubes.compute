@@ -7,15 +7,15 @@ struct Triangle {
     float3 vertexA;
     float3 vertexB;
     float3 vertexC;
-    float2 uv;
-    float4 texcoord;
+    float2 uvA;
+    float2 uvB;
+    float2 uvC;
 };
 
 struct Dato {
     float3 posicion;
-    float valor;
     float2 uv;
-    float4 texcoor;
+    float valor;
 };
 
 AppendStructuredBuffer<Triangle> triangles;
@@ -29,6 +29,11 @@ float3 interpolateVerts(float4 v1, float4 v2) {
     return v1.xyz + t * (v2.xyz - v1.xyz);
 }
 
+float2 interpolateUV(float3 v1, float3 v2) {
+    float t = (isoLevel - v1.z) / (v2.z - v1.z);
+    return v1.xy + t * (v2.xy - v1.xy);
+}
+
 int indexFromCoord(int x, int y, int z) {
     return z + y * numPointsPerAxis.z + x * numPointsPerAxis.z * numPointsPerAxis.y;
 }
@@ -37,6 +42,12 @@ float4 pointAtIndex(int i)
 {
     Dato dato = datos[i];
     return float4(dato.posicion, dato.valor);
+}
+
+float3 uvAtIndex(int i)
+{
+    Dato dato = datos[i];
+    return float3(dato.uv, dato.valor);
 }
 
 [numthreads(numThreads, numThreads, numThreads)]
@@ -57,6 +68,17 @@ void March(int3 id : SV_DispatchThreadID)
         pointAtIndex(indexFromCoord(id.x, id.y + 1, id.z + 1))
     };
 
+    float3 uvCorners[8] = {
+        uvAtIndex(indexFromCoord(id.x, id.y, id.z)),
+        uvAtIndex(indexFromCoord(id.x + 1, id.y, id.z)),
+        uvAtIndex(indexFromCoord(id.x + 1, id.y, id.z + 1)),
+        uvAtIndex(indexFromCoord(id.x, id.y, id.z + 1)),
+        uvAtIndex(indexFromCoord(id.x, id.y + 1, id.z)),
+        uvAtIndex(indexFromCoord(id.x + 1, id.y + 1, id.z)),
+        uvAtIndex(indexFromCoord(id.x + 1, id.y + 1, id.z + 1)),
+        uvAtIndex(indexFromCoord(id.x, id.y + 1, id.z + 1))
+    };
+
     // Calculate unique index for each cube configuration.
     // There are 256 possible values
     // A value of 0 means cube is entirely inside surface; 255 entirely outside.
@@ -75,6 +97,7 @@ void March(int3 id : SV_DispatchThreadID)
     for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3) {
         // Get indices of corner points A and B for each of the three edges
         // of the cube that need to be joined to form the triangle.
+
         int a0 = cornerIndexAFromEdge[triangulation[cubeIndex][i]];
         int b0 = cornerIndexBFromEdge[triangulation[cubeIndex][i]];
 
@@ -85,9 +108,14 @@ void March(int3 id : SV_DispatchThreadID)
         int b2 = cornerIndexBFromEdge[triangulation[cubeIndex][i + 2]];
 
         Triangle tri;
+
         tri.vertexA = interpolateVerts(cubeCorners[a0], cubeCorners[b0]);
+        tri.uvA = interpolateUV(uvCorners[a0], uvCorners[b0]);
         tri.vertexB = interpolateVerts(cubeCorners[a1], cubeCorners[b1]);
+        tri.uvB = interpolateUV(uvCorners[a1], uvCorners[b1]);
         tri.vertexC = interpolateVerts(cubeCorners[a2], cubeCorners[b2]);
+        tri.uvC = interpolateUV(uvCorners[a2], uvCorners[b2]);
+
         triangles.Append(tri);
     }
 }

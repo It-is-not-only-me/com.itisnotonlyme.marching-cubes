@@ -9,6 +9,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
     {
         [SerializeField] private ComputeShader _computeShader;
         [SerializeField] private Shader _geometryShader;
+        [SerializeField] private Material _material;
 
         [Space]
 
@@ -18,14 +19,14 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         [SerializeField] private DatosEventoSO _obtenerDatosEvento, _sacarDatosEvento, _actualizarDatosEvento;
 
-        private Material _material;
         private ComputeBuffer _argBuffer;
         private BufferManager _bufferManager;
 
 
         private void Awake()
         {
-            _material = new Material(_geometryShader);
+            if (_material == null)
+                _material = new Material(_geometryShader);
             CrearArgBuffer();
             _bufferManager = new BufferManager(_computeShader, _isoLevel);
         }

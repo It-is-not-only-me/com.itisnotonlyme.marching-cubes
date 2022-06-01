@@ -14,9 +14,6 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
 
     [SerializeField] private float _velocidad;
     [SerializeField] private float _noiseScale;
-
-    private Vector3Int _dimension;
-    private bool _creado = false;
     private float _desfase = 0f;
 
     public override Vector3Int Dimension
@@ -27,11 +24,6 @@ public class ObtenerDatosEjemplo : ObtenerDatosSO
     public override int Id
     {
         get => GetInstanceID();
-    }
-
-    private void OnEnable()
-    {
-        _creado = false;
     }
 
     public override IEnumerable<Dato> GetDatos()

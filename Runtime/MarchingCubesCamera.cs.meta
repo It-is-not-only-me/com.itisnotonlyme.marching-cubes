@@ -6,6 +6,7 @@ MonoImporter:
   defaultReferences:
   - _computeShader: {fileID: 7200000, guid: 533d3048690c3654f8da770ab54291ef, type: 3}
   - _geometryShader: {fileID: 4800000, guid: 4a09d4b68d326984093b12759191ac9c, type: 3}
+  - _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
   - _obtenerDatosEvento: {instanceID: 0}
   - _sacarDatosEvento: {instanceID: 0}
   - _actualizarDatosEvento: {instanceID: 0}
