@@ -28,6 +28,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
             }
         }
 
+        private int _cantidadDeFloat = 6;
+
         public BufferManager(ComputeShader computeSahder, float isoLevel)
         {
             _datos = new List<IObtenerDatos>();
@@ -51,7 +53,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         public void ActualizarDatos(IObtenerDatos datos)
         {
             int datosCount = Cantidad(datos);
-            int datosStride = 6 * sizeof(float);
+            int datosStride = _cantidadDeFloat * sizeof(float);
             InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
             infoBuffer.DatosBuffer.SetCounterValue(0);
             Dato[] datosObtenidos = new Dato[datosCount];
@@ -100,7 +102,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             {
                 IObtenerDatos datos = _datos[i];
                 int datosCount = Cantidad(datos);
-                int datosStride = 4 * sizeof(float);
+                int datosStride = _cantidadDeFloat * sizeof(float);
                 InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
                 infoBuffer.Index = Dispatch(datos, infoBuffer.DatosBuffer);
                 infoBuffer.NecesitaActualizar = false;

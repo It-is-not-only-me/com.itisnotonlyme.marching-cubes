@@ -18,6 +18,7 @@ public class ChunkSpawner : MonoBehaviour
 
     [Space]
 
+
     [SerializeField] private float _distanciaActualizacion = 10f;
 
     private struct InfoChunk
