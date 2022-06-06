@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
-    [CreateAssetMenu(fileName = "Pasar datos", menuName = "Evento/Marching Cubes/Evento de pasar datos")]
+    [CreateAssetMenu(fileName = "Pasar datos", menuName = "MarchingCubes/Eventos/Evento de pasar datos")]
     public class DatosEventoSO : ScriptableObject
     {
         public Action<IObtenerDatos> ObtenerDatosEvento;

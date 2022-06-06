@@ -6,12 +6,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
     public class MarchingCubesRenderer : MonoBehaviour
     {
-        [SerializeField] private Material _material;
-        [SerializeField] private Camera _camara;
-        [SerializeField] private Shader _geometryShader;
-        [SerializeField] private ComputeShader _computeShader;
-        [SerializeField][Range(0, 1)] private float _isoLevel;
+        [SerializeField] Camera _camara;
+        [SerializeField] Material _material;
+        [SerializeField] DatosRender _datos;
 
+        private Material _material;
         private GenerarDatos _generador;
         private ComputeBuffer _argBuffer, _triangulosBuffer, _datosBuffer;
 
@@ -22,10 +21,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Awake()
         {
-            if (_camara == null)
-                _camara = Camera.main;
-            if (_material == null)
-                _material = new Material(_geometryShader);
+            //if (_datos.Camera == null)
+                _datos.Camera = Camera.main;
+            if (_datos.Material == null)
+                _material = new Material(_datos.GeometryShader);
 
             if (!TryGetComponent<GenerarDatos>(out _generador))
                 Debug.LogError("No tenes un generador en este gameObject");
@@ -47,7 +46,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _material.SetPass(0);
             _material.SetBuffer("triangulos", _triangulosBuffer);
             Bounds bounds = new Bounds(_generador.Posicion, _generador.Dimension * 2);
-            Graphics.DrawProceduralIndirect(_material, bounds, MeshTopology.Points, _argBuffer, 0, _camara);
+            Graphics.DrawProceduralIndirect(_material, bounds, MeshTopology.Points, _argBuffer, 0, _datos.Camera);
         }
 
         private void RegenerarMesh()
@@ -70,14 +69,14 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Dispatch()
         {
-            int kernel = _computeShader.FindKernel("March");
+            int kernel = _datos.ComputeShader.FindKernel("March");
             Vector3Int dimension = _generador.Dimension;
-            _computeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
-            _computeShader.SetBuffer(kernel, "datos", _datosBuffer);
-            _computeShader.SetFloat("isoLevel", _isoLevel);
-            _computeShader.SetInts("numPointsPerAxis", dimension.x, dimension.y, dimension.z);
+            _datos.ComputeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
+            _datos.ComputeShader.SetBuffer(kernel, "datos", _datosBuffer);
+            _datos.ComputeShader.SetFloat("isoLevel", _datos.IsoLevel);
+            _datos.ComputeShader.SetInts("numPointsPerAxis", dimension.x, dimension.y, dimension.z);
 
-            _computeShader.Dispatch(kernel, dimension.x, dimension.y, dimension.z);
+            _datos.ComputeShader.Dispatch(kernel, dimension.x, dimension.y, dimension.z);
         }
 
         private void GenerarDatosBuffer(int count)

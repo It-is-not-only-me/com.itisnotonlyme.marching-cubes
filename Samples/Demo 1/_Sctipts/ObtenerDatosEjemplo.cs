@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using ItIsNotOnlyMe.MarchingCubes;
 
-[CreateAssetMenu(fileName = "Perlin noise", menuName = "Ejemplo marching cubes/Perlin noise")]
+[CreateAssetMenu(fileName = "Perlin noise", menuName = "MarchingCubes/Ejemplo/Perlin noise")]
 public class ObtenerDatosEjemplo : ObtenerDatosSO
 {
     [SerializeField] private uint _dimensionX, _dimensionY, _dimensionZ;
