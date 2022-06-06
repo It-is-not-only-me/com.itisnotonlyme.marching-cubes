@@ -47,4 +47,9 @@ public class GeneradorDatosPerlin : GenerarDatos
                     yield return dato;
                 }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(Posicion, Dimension * 2);
+    }
 }

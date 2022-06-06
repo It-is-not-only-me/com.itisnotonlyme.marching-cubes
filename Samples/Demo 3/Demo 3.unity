@@ -228,8 +228,6 @@ GameObject:
   - component: {fileID: 1012507094}
   - component: {fileID: 1012507093}
   - component: {fileID: 1012507092}
-  - component: {fileID: 1012507095}
-  - component: {fileID: 1012507096}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -303,42 +301,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1012507095
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012507091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f82ed759f24012479b954a25d98d7b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _tamanioX: 10
-  _tamanioY: 10
-  _tamanioZ: 10
-  _scale: 1
-  _corrimiento: {x: 0, y: 0, z: 0}
-  _velocidad: 0
-  _noiseScale: 0.05
---- !u!114 &1012507096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012507091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7bcf8910929a2c479710c12a19b58f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
-  _camara: {fileID: 1012507093}
-  _geometryShader: {fileID: 4800000, guid: 4a09d4b68d326984093b12759191ac9c, type: 3}
-  _computeShader: {fileID: 7200000, guid: 533d3048690c3654f8da770ab54291ef, type: 3}
-  _isoLevel: 0.12
 --- !u!1 &2022582902
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,7 +318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2022582903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,9 +331,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f82ed759f24012479b954a25d98d7b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tamanioX: 5
-  _tamanioY: 5
-  _tamanioZ: 5
+  _tamanioX: 10
+  _tamanioY: 10
+  _tamanioZ: 10
   _scale: 1
   _corrimiento: {x: 0, y: 0, z: 0}
   _velocidad: 0.01

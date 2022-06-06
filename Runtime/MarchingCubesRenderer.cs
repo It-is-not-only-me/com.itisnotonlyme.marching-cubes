@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
@@ -30,8 +31,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 Debug.LogError("No tenes un generador en este gameObject");
 
             CrearArgBuffer();
+        }
 
-            RegenerarMesh();
+        private void Update()
+        {
+            RegenerarMesh();            
         }
 
         private void OnRenderObject()
@@ -39,15 +43,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int[] args = new int[] { 0, 1, 0, 1 };
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(_triangulosBuffer, _argBuffer, 0);
-            _argBuffer.GetData(args);
-
-            Debug.Log("Tenemos " + args[0] + " triangulos");
 
             _material.SetPass(0);
             _material.SetBuffer("triangulos", _triangulosBuffer);
-            //Bounds bounds = new Bounds(_generador.Posicion, _generador.Tamanio);
-            //Graphics.DrawProceduralIndirect(_material, bounds, MeshTopology.Points, _argBuffer, 0, _camara);
-            Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
+            Bounds bounds = new Bounds(_generador.Posicion, _generador.Dimension * 2);
+            Graphics.DrawProceduralIndirect(_material, bounds, MeshTopology.Points, _argBuffer, 0, _camara);
         }
 
         private void RegenerarMesh()
@@ -56,15 +56,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             GenerarDatosBuffer(datosCount);
             GenerarTriangulosBuffer(datosCount * _cantidadTriangulosPorDato);
-
-            Dato[] datosObtenidos = new Dato[datosCount];
-            int contador = 0;
-            foreach (Dato dato in _generador.GetDatos())
-            {
-                datosObtenidos[contador] = dato;
-                contador++;
-            }
-            _datosBuffer.SetData(datosObtenidos);
+            _datosBuffer.SetData(_generador.GetDatos().ToList());
 
             int[] args = new int[] { 0, 1, 0, 1 };
             _argBuffer.SetData(args);
