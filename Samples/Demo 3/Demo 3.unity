@@ -310,8 +310,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2022582904}
-  - component: {fileID: 2022582905}
   - component: {fileID: 2022582903}
+  - component: {fileID: 2022582905}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Untagged
@@ -334,8 +334,6 @@ MonoBehaviour:
   _tamanioX: 10
   _tamanioY: 10
   _tamanioZ: 10
-  _scale: 1
-  _corrimiento: {x: 0, y: 0, z: 0}
   _velocidad: 0.01
   _noiseScale: 0.05
 --- !u!4 &2022582904
@@ -362,11 +360,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2022582902}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7bcf8910929a2c479710c12a19b58f5, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b133483e223b94d811f383f3910b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
-  _camara: {fileID: 1012507093}
-  _geometryShader: {fileID: 4800000, guid: 4a09d4b68d326984093b12759191ac9c, type: 3}
-  _computeShader: {fileID: 7200000, guid: 533d3048690c3654f8da770ab54291ef, type: 3}
-  _isoLevel: 0.5
+  _datosRender: {fileID: 11400000, guid: 0f0e9e717a5805447b3741b227534715, type: 2}
+  _obtenerDatosEvento: {fileID: 0}
+  _sacarDatosEvento: {fileID: 0}
+  _actualizarDatosEvento: {fileID: 0}

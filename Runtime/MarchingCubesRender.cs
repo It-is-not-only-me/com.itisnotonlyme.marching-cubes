@@ -5,55 +5,31 @@ using UnityEngine;
 namespace ItIsNotOnlyMe.MarchingCubes
 {
     [AddComponentMenu("Marching cubes/Camara manager")]
-    public class MarchingCubesCamera : MonoBehaviour
+    public class MarchingCubesRender : MonoBehaviour
     {
-        [SerializeField] private ComputeShader _computeShader;
-        [SerializeField] private Shader _geometryShader;
         [SerializeField] private Material _material;
-
-        [Space]
-
-        [SerializeField] [Range(0, 1)] private float _isoLevel;
-
-        [Space]
-
-        [SerializeField] private DatosEventoSO _obtenerDatosEvento, _sacarDatosEvento, _actualizarDatosEvento;
+        [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer;
         private BufferManager _bufferManager;
-
+        private GenerarDatos _generador;
 
         private void Awake()
         {
             if (_material == null)
-                _material = new Material(_geometryShader);
+                _material = new Material(_datosRender.GeometryShader);
             CrearArgBuffer();
-            _bufferManager = new BufferManager(_computeShader, _isoLevel);
+            _bufferManager = new BufferManager(_datosRender.ComputeShader, _datosRender.IsoLevel);
+            if (!TryGetComponent(out _generador))
+                Debug.LogError("No hay generador");
+            RecibirDatos(_generador);            
         }
 
-        private void OnEnable()
+        private void Update()
         {
-            if (_obtenerDatosEvento != null)
-                _obtenerDatosEvento.ObtenerDatosEvento += RecibirDatos;
-            
-            if (_sacarDatosEvento != null)
-                _sacarDatosEvento.ObtenerDatosEvento += EliminarDatos;
-            
-            if (_actualizarDatosEvento != null)
-                _actualizarDatosEvento.ObtenerDatosEvento += ActualizarDatos;
-        } 
-
-        private void OnDisable()
-        {
-            if (_obtenerDatosEvento != null)
-                _obtenerDatosEvento.ObtenerDatosEvento -= RecibirDatos;
-
-            if (_sacarDatosEvento != null)
-                _sacarDatosEvento.ObtenerDatosEvento -= EliminarDatos;
-
-            if (_actualizarDatosEvento != null)
-                _actualizarDatosEvento.ObtenerDatosEvento -= ActualizarDatos;
-        } 
+            if (_generador.Actualizar)
+                ActualizarDatos(_generador);
+        }
 
         private void OnRenderObject()
         {
@@ -73,11 +49,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void RecibirDatos(IObtenerDatos datos)
         {
             _bufferManager.AgregarDatos(datos);
-        }
-
-        private void EliminarDatos(IObtenerDatos datos)
-        {
-            _bufferManager.SacarDatos(datos);
         }
 
         private void ActualizarDatos(IObtenerDatos datos)

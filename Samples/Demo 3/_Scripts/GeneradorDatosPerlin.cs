@@ -14,8 +14,8 @@ public class GeneradorDatosPerlin : GenerarDatos
     private float _desfase = 0f;
     private bool _actualizarse = true;
 
-    public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ);
-    public override Vector3 Posicion => transform.position;
+    public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
+    private Vector3 _posicion => transform.position;
     public override bool Actualizar 
     { 
         get 
@@ -34,13 +34,12 @@ public class GeneradorDatosPerlin : GenerarDatos
         Dato dato = new Dato(Vector3.zero, 0);
         _desfase += _velocidad;
 
-        float noiseScale = 0.05f;
-        for (int i = 0; i < _tamanioX; i++)
-            for (int j = 0; j < _tamanioY; j++)
-                for (int k = 0; k < _tamanioZ; k++)
+        for (int i = 0; i < _tamanioX + 1; i++)
+            for (int j = 0; j < _tamanioY + 1; j++)
+                for (int k = 0; k < _tamanioZ + 1; k++)
                 {
-                    Vector3 posicion = new Vector3(i, j, k) + Posicion - Dimension / 2;
-                    float valorPerlin = Mathf.PerlinNoise(i * noiseScale + _desfase, k * noiseScale);
+                    Vector3 posicion = new Vector3(i, j, k) + _posicion - Dimension / 2;
+                    float valorPerlin = Mathf.PerlinNoise(i * _noiseScale + _desfase, k * _noiseScale);
                     float valor = valorPerlin * _tamanioY - j;
                     dato.CargarDatos(posicion, valor);
                     yield return dato;
@@ -49,6 +48,6 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(Posicion, Dimension);
+        Gizmos.DrawWireCube(_posicion, Dimension - Vector3Int.one);
     }
 }
