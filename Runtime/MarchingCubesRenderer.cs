@@ -14,8 +14,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private GenerarDatos _generador;
         private ComputeBuffer _argBuffer, _triangulosBuffer, _datosBuffer;
 
-        private int _countActual = -1;
-        private int _strideTriangulos = 9 * sizeof(float);
+        private int _countActual = 0;
+        private int _strideTriangulos = 3 * (3 * sizeof(float));
         private int _cantidadTriangulosPorDato = 5;
         private int _strideDatos = 6 * sizeof(float);
 
@@ -30,12 +30,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 Debug.LogError("No tenes un generador en este gameObject");
 
             CrearArgBuffer();
-        }
 
-        private void Update()
-        {
-            if (_generador.Actualizar)
-                RegenerarMesh();
+            RegenerarMesh();
         }
 
         private void OnRenderObject()
@@ -44,6 +40,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(_triangulosBuffer, _argBuffer, 0);
             _argBuffer.GetData(args);
+
+            Debug.Log("Tenemos " + args[0] + " triangulos");
 
             _material.SetPass(0);
             _material.SetBuffer("triangulos", _triangulosBuffer);
@@ -67,13 +65,21 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 contador++;
             }
             _datosBuffer.SetData(datosObtenidos);
+
+            int[] args = new int[] { 0, 1, 0, 1 };
+            _argBuffer.SetData(args);
+            ComputeBuffer.CopyCount(_datosBuffer, _argBuffer, 0);
+            _argBuffer.GetData(args);
+
+            Debug.Log("Tenemos " + args[0] + " datos");
+
             Dispatch();
         }
 
         private void Dispatch()
         {
             int kernel = _computeShader.FindKernel("March");
-            Vector3Int dimension = _generador.Tamanio;
+            Vector3Int dimension = _generador.Dimension;
             _computeShader.SetBuffer(kernel, "triangles", _triangulosBuffer);
             _computeShader.SetBuffer(kernel, "datos", _datosBuffer);
             _computeShader.SetFloat("isoLevel", _isoLevel);
@@ -98,7 +104,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void GenerarTriangulosBuffer(int count)
         {
-            if (_triangulosBuffer == null || _countActual * _cantidadTriangulosPorDato < count)
+            if (_triangulosBuffer == null || (_countActual * _cantidadTriangulosPorDato) < count)
             {
                 if (_triangulosBuffer != null)
                     _triangulosBuffer.Dispose();
@@ -110,8 +116,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private int Cantidad()
         {
-            Vector3 dimension = _generador.Tamanio;
-            return Mathf.RoundToInt(dimension.x * dimension.y * dimension.z);
+            Vector3Int dimension = _generador.Dimension;
+            return dimension.x * dimension.y * dimension.z;
         }
 
         private void CrearArgBuffer()

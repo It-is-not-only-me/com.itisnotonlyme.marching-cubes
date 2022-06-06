@@ -9,7 +9,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         public virtual bool Actualizar { get; protected set; }
 
-        public abstract Vector3Int Tamanio { get; }
+        public abstract Vector3Int Dimension { get; }
 
         public abstract Vector3 Posicion { get; }
 

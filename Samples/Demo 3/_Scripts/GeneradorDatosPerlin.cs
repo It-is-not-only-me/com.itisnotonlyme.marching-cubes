@@ -16,7 +16,7 @@ public class GeneradorDatosPerlin : GenerarDatos
     private float _desfase = 0f;
     private bool _actualizarse = true;
 
-    public override Vector3Int Tamanio => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ);
+    public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ);
     public override Vector3 Posicion => transform.position + _corrimiento;
     public override bool Actualizar 
     { 
