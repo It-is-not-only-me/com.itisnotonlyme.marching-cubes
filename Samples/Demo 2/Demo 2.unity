@@ -394,10 +394,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0b133483e223b94d811f383f3910b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _computeShader: {fileID: 7200000, guid: 533d3048690c3654f8da770ab54291ef, type: 3}
-  _geometryShader: {fileID: 4800000, guid: 4a09d4b68d326984093b12759191ac9c, type: 3}
-  _material: {fileID: 0}
-  _isoLevel: 0.5
-  _obtenerDatosEvento: {fileID: 11400000, guid: cf42097d3db4f134fb14b5bb36621a9e, type: 2}
-  _sacarDatosEvento: {fileID: 11400000, guid: 3c4393910f49f184bba5a7063840afff, type: 2}
-  _actualizarDatosEvento: {fileID: 11400000, guid: 245f8481ad3264c4890962d11403b6f6, type: 2}
+  _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
+  _datosRender: {fileID: 11400000, guid: 0f0e9e717a5805447b3741b227534715, type: 2}

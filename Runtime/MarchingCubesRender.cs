@@ -66,6 +66,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
+
+            //Graphics.DrawProceduralNow(MeshTopology.Points, args[0]);
+            //ComputeBuffer.DrawProcedural(Matrix4x4.identity, _material, new Bounds(transform.position, (Vector3.one * 60)), MeshTopology.Points, _argBuffer);
             Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
         }
 

@@ -1,7 +1,8 @@
-    using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ItIsNotOnlyMe.MarchingCubes;
+
 
 public class GeneradorDatosPerlin : GenerarDatos
 {
@@ -11,8 +12,8 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     [SerializeField] private float _velocidad;
     [SerializeField] private float _noiseScale;
+    [SerializeField] private bool _actualizar = true;
     private float _desfase = 0f;
-    private bool _actualizarse = true;
 
     public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
     private Vector3 _posicion => transform.position;
@@ -20,13 +21,22 @@ public class GeneradorDatosPerlin : GenerarDatos
     { 
         get 
         {
-            if (_actualizarse)
+            if (_actualizar)
             {
-                _actualizarse = false;
+                _actualizar = false;
                 return true;
             }
             return false;
         }
+    }
+
+    public void Inicializar(Vector3 posicion, Vector3Int dimension)
+    {
+        transform.position = posicion;
+        _tamanioX = (uint)dimension.x;
+        _tamanioY = (uint)dimension.y;
+        _tamanioZ = (uint)dimension.z;
+        _actualizar = true;
     }
 
     public override IEnumerable<Dato> GetDatos()
@@ -39,7 +49,7 @@ public class GeneradorDatosPerlin : GenerarDatos
                 for (int k = 0; k < _tamanioZ + 1; k++)
                 {
                     Vector3 posicion = new Vector3(i, j, k) + _posicion - Dimension / 2;
-                    float valorPerlin = Mathf.PerlinNoise(i * _noiseScale + _desfase, k * _noiseScale);
+                    float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + _desfase, posicion.z * _noiseScale);
                     float valor = valorPerlin * _tamanioY - j;
                     dato.CargarDatos(posicion, valor);
                     yield return dato;

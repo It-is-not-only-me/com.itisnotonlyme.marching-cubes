@@ -293,15 +293,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1012507091}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -96.8}
+  m_LocalRotation: {x: 0, y: -0.6313528, z: 0, w: 0.77549577}
+  m_LocalPosition: {x: 58, y: 5, z: 36.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2022582902
+  m_LocalEulerAnglesHint: {x: 0, y: -78.3, z: 0}
+--- !u!1 &1317575781
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -309,40 +309,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2022582904}
-  - component: {fileID: 2022582903}
-  - component: {fileID: 2022582905}
+  - component: {fileID: 1317575782}
+  - component: {fileID: 1317575783}
   m_Layer: 0
-  m_Name: Chunk
+  m_Name: Generador
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2022582903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2022582902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f82ed759f24012479b954a25d98d7b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _tamanioX: 10
-  _tamanioY: 10
-  _tamanioZ: 10
-  _velocidad: 0.01
-  _noiseScale: 0.05
---- !u!4 &2022582904
+--- !u!4 &1317575782
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2022582902}
+  m_GameObject: {fileID: 1317575781}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -351,20 +333,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2022582905
+--- !u!114 &1317575783
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2022582902}
+  m_GameObject: {fileID: 1317575781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b133483e223b94d811f383f3910b31, type: 3}
+  m_Script: {fileID: 11500000, guid: ec1b616ae4115dc479173614b89ef29d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
-  _datosRender: {fileID: 11400000, guid: 0f0e9e717a5805447b3741b227534715, type: 2}
-  _obtenerDatosEvento: {fileID: 0}
-  _sacarDatosEvento: {fileID: 0}
-  _actualizarDatosEvento: {fileID: 0}
+  _prefab: {fileID: 4044685854255544995, guid: 281cd95fcf2345344860a30c802c04d2, type: 3}
+  _radio: 3
+  _dimensionDeChunk: {x: 20, y: 20, z: 20}

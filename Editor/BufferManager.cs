@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
@@ -55,16 +56,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int datosCount = Cantidad(datos);
             int datosStride = _cantidadDeFloat * sizeof(float);
             InfoBuffer infoBuffer = ObtenerInfoBuffer(datos.Id, datosCount, datosStride);
-            infoBuffer.DatosBuffer.SetCounterValue(0);
-            Dato[] datosObtenidos = new Dato[datosCount];
-            int contador = 0;
-            foreach (Dato dato in datos.GetDatos())
-            {
-                datosObtenidos[contador] = dato;
-                contador++;
-            }
-
-            infoBuffer.DatosBuffer.SetData(datosObtenidos);
+            infoBuffer.DatosBuffer.SetCounterValue(0);  
+            infoBuffer.DatosBuffer.SetData(datos.GetDatos().ToList());
             infoBuffer.NecesitaActualizar = true;
             _datosDiccionario[datos.Id] = infoBuffer;
         }
