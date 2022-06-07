@@ -62,7 +62,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int[] args = new int[] { 0, 1, 0, 0 };
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);
-            //_argBuffer.GetData(args);
+            _argBuffer.GetData(args);
+
+            //Debug.Log(args[0]);
 
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
