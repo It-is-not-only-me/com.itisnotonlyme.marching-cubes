@@ -19,7 +19,7 @@ public class GeneradorDeChunks : MonoBehaviour
                 GameObject chunk = Instantiate(_prefab, transform);
                 GeneradorDatosPerlin generador = chunk.GetComponent<GeneradorDatosPerlin>();
 
-                Vector3 posicion = transform.position + Vector3.right * (i - 1 / 2) * _dimensionDeChunk.x + Vector3.forward * (k - 1 / 2) * _dimensionDeChunk.z;
+                Vector3 posicion = transform.position + Vector3.right * i * _dimensionDeChunk.x / 2 + Vector3.forward * k * _dimensionDeChunk.z / 2;
                 generador.Inicializar(posicion, _dimensionDeChunk);
 
                 if (contador >= 10)

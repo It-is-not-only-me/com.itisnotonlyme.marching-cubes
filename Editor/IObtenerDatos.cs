@@ -1,19 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/*
- * IObtenerDatos tiene que decir cuantos puntos en cada eje va a mandar
- * La cantidad total no es necesario
- * 
- */
 namespace ItIsNotOnlyMe.MarchingCubes
 {
     public interface IObtenerDatos
     {
-        public Vector3Int Dimension { get; }
+        public Bounds Bounds { get; }
 
-        public int Id { get; }
+        public Vector3Int NumeroDePuntosPorEje { get; }
 
-        public IEnumerable<Dato> GetDatos();
+        public Dato[] GetDatos();
     }
 }

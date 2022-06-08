@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4044685854255545005}
   - component: {fileID: 4044685854255544994}
-  - component: {fileID: 4044685854255545004}
+  - component: {fileID: 4589823560680067385}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Untagged
@@ -48,10 +48,8 @@ MonoBehaviour:
   _tamanioX: 30
   _tamanioY: 20
   _tamanioZ: 30
-  _velocidad: 0
-  _noiseScale: 0.05
   _actualizar: 1
---- !u!114 &4044685854255545004
+--- !u!114 &4589823560680067385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,7 +58,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4044685854255544995}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b133483e223b94d811f383f3910b31, type: 3}
+  m_Script: {fileID: 11500000, guid: b71de3c0e752aee46bad158ae11eac3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}

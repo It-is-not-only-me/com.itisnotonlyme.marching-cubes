@@ -6,28 +6,25 @@ using ItIsNotOnlyMe.MarchingCubes;
 
 public class GeneradorDatosPerlin : GenerarDatos
 {
-    [SerializeField] private uint _tamanioX, _tamanioY, _tamanioZ;
-
-    [Space]
-
-    [SerializeField] private float _velocidad;
-    [SerializeField] private float _noiseScale;
     [SerializeField] private bool _actualizar = true;
 
-    public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
-    private Vector3 _posicion => transform.position;
+    public override Vector3Int NumeroDePuntosPorEje => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
     public override bool Actualizar 
     { 
         get 
         {
-            if (_actualizar)
-            {
-                _actualizar = false;
-                return true;
-            }
-            return false;
+            bool necesitaActualizar = _actualizar;
+            if (_actualizar) _actualizar = false;
+            return necesitaActualizar; 
         }
     }
+
+    public override Bounds Bounds => _bounds;
+
+    private uint _tamanioX, _tamanioY, _tamanioZ;
+    private Dato[] _datos;
+    private float _noiseScale;
+    private Bounds _bounds;
 
     public void Inicializar(Vector3 posicion, Vector3Int dimension)
     {
@@ -36,26 +33,36 @@ public class GeneradorDatosPerlin : GenerarDatos
         _tamanioY = (uint)dimension.y;
         _tamanioZ = (uint)dimension.z;
         _actualizar = true;
+        Vector3 size = NumeroDePuntosPorEje / 2;
+        _bounds = new Bounds(transform.position, size);
+        GenerarDatos();
     }
 
-    public override IEnumerable<Dato> GetDatos()
+    public override Dato[] GetDatos()
     {
-        Dato dato = new Dato(Vector3.zero, 0);
+        return _datos;
+    }
 
-        for (int i = 0; i < _tamanioX + 1; i++)
-            for (int j = 0; j < _tamanioY + 1; j++)
-                for (int k = 0; k < _tamanioZ + 1; k++)
+    private void GenerarDatos()
+    {
+        Vector3Int puntosPorEje = NumeroDePuntosPorEje;
+        _datos = new Dato[puntosPorEje.x * puntosPorEje.y * puntosPorEje.z];
+
+        int contador = 0;
+        for (int i = 0; i < puntosPorEje.x; i++)
+            for (int j = 0; j < puntosPorEje.y; j++)
+                for (int k = 0; k < puntosPorEje.z; k++)
                 {
-                    Vector3 posicion = new Vector3(i, j, k) + _posicion - Dimension / 2;
+                    Vector3 posicion = new Vector3(i, j, k) + _bounds.center - _bounds.size;
                     float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + 200, posicion.z * _noiseScale + 200);
                     float valor = valorPerlin * _tamanioY - j;
-                    dato.CargarDatos(posicion, valor);
-                    yield return dato;
+                    _datos[contador].CargarDatos(posicion, valor);
+                    contador++;
                 }
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(_posicion, Dimension - Vector3Int.one);
+        Gizmos.DrawWireCube(_bounds.center, _bounds.size);
     }
 }
