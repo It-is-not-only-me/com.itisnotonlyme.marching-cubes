@@ -13,7 +13,6 @@ public class GeneradorDatosPerlin : GenerarDatos
     [SerializeField] private float _velocidad;
     [SerializeField] private float _noiseScale;
     [SerializeField] private bool _actualizar = true;
-    private float _desfase = 0f;
 
     public override Vector3Int Dimension => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
     private Vector3 _posicion => transform.position;
@@ -42,14 +41,13 @@ public class GeneradorDatosPerlin : GenerarDatos
     public override IEnumerable<Dato> GetDatos()
     {
         Dato dato = new Dato(Vector3.zero, 0);
-        _desfase += _velocidad;
 
         for (int i = 0; i < _tamanioX + 1; i++)
             for (int j = 0; j < _tamanioY + 1; j++)
                 for (int k = 0; k < _tamanioZ + 1; k++)
                 {
                     Vector3 posicion = new Vector3(i, j, k) + _posicion - Dimension / 2;
-                    float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + _desfase, posicion.z * _noiseScale);
+                    float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + 200, posicion.z * _noiseScale + 200);
                     float valor = valorPerlin * _tamanioY - j;
                     dato.CargarDatos(posicion, valor);
                     yield return dato;

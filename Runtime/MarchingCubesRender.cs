@@ -16,25 +16,24 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Awake()
         {
-            if (_material == null)
-                _material = new Material(_datosRender.GeometryShader);
+            Material nuevoMaterial = new Material(_datosRender.GeometryShader);
+            if (_material != null)
+                nuevoMaterial.CopyPropertiesFromMaterial(_material);
+            _material = nuevoMaterial;
+
             CrearArgBuffer();
             _bufferManager = new BufferManager(_datosRender.ComputeShader, _datosRender.IsoLevel);
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
-            RecibirDatos(_generador);            
+            RecibirDatos(_generador);
         }
 
         private void Update()
         {
             if (_generador.Actualizar)
                 ActualizarDatos(_generador);
-        }
-
-        private void OnRenderObject()
-        {
             _bufferManager.ConfigurarBuffer();
-            Render();
+            Render();            
         }
 
         private void OnDestroy() => DestruirBuffers();
@@ -59,19 +58,16 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void Render()
         {
             ComputeBuffer triangulosBuffer = _bufferManager.Triangulos();
-            int[] args = new int[] { 0, 1, 0, 0 };
+            int[] args = new int[] { 0, 1, 0, 0};
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);
-            _argBuffer.GetData(args);
-
-            //Debug.Log(args[0]);
 
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
 
-            //Graphics.DrawProceduralNow(MeshTopology.Points, args[0]);
-            //ComputeBuffer.DrawProcedural(Matrix4x4.identity, _material, new Bounds(transform.position, (Vector3.one * 60)), MeshTopology.Points, _argBuffer);
-            Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
+            Bounds bounds = new Bounds(transform.position, _generador.Dimension / 2);
+            Graphics.DrawProceduralIndirect(_material, bounds, MeshTopology.Points, _argBuffer);
+            //Graphics.DrawProceduralIndirectNow(MeshTopology.Points, _argBuffer);
         }
 
         private void DestruirBuffers()

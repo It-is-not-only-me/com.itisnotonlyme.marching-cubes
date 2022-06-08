@@ -191,7 +191,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             if (!_datosDiccionario.ContainsKey(id))
             {
-                infoBuffer = new InfoBuffer(new ComputeBuffer(cantidad, stride));
+                ComputeBuffer computeBuffer = new ComputeBuffer(cantidad, stride);
+                infoBuffer = new InfoBuffer(computeBuffer);
                 _datosDiccionario.Add(id, infoBuffer);
             }
             else
