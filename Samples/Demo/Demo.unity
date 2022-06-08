@@ -346,5 +346,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 4044685854255544995, guid: 281cd95fcf2345344860a30c802c04d2, type: 3}
-  _radio: 3
+  _radio: 10
   _dimensionDeChunk: {x: 20, y: 20, z: 20}
