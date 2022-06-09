@@ -31,6 +31,11 @@ public class GeneradorDeChunks : MonoBehaviour
                     yield return null;
                 }
 
+                chunk.AddComponent<MeshFilter>();
+                MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
+                meshFilter.mesh = MarchingCubes.CrearMesh(generador, 0.5f);
+                chunk.AddComponent<MeshRenderer>();
+
                 contador++;
             }
 
