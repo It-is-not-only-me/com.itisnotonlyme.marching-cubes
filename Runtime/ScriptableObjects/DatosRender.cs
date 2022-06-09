@@ -3,10 +3,14 @@
 namespace ItIsNotOnlyMe.MarchingCubes
 {
     [CreateAssetMenu(fileName = "Datos para render", menuName = "MarchingCubes/Datos para render")]
-    public class DatosRender : ScriptableObject
+    public class DatosRender : ScriptableObject, IDatoRender
     {
-        public Shader GeometryShader;
-        public ComputeShader ComputeShader;
-        [Range(0, 1)] public float IsoLevel;
+        [SerializeField] private Shader _geometryShader;
+        [SerializeField] private ComputeShader _computeShader;
+        [SerializeField] [Range(0, 1)] private float _isoLevel;
+
+        public Shader GeometryShader() => _geometryShader;
+        public ComputeShader ComputeShader() => _computeShader;
+        public float IsoLevel() => _isoLevel;
     }
 }

@@ -21,7 +21,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Awake()
         {
-            Material nuevoMaterial = new Material(_datosRender.GeometryShader);
+            Material nuevoMaterial = new Material(_datosRender.GeometryShader());
             nuevoMaterial?.CopyPropertiesFromMaterial(_material);
             _material = nuevoMaterial;
             CrearArgBuffer();
@@ -69,13 +69,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         public void Dispatch(Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
         {
-            int kernel = _datosRender.ComputeShader.FindKernel("March");
-            _datosRender.ComputeShader.SetBuffer(kernel, "triangles", triangulosBuffer);
-            _datosRender.ComputeShader.SetBuffer(kernel, "datos", datosBuffer);
-            _datosRender.ComputeShader.SetFloats("isoLevel", _datosRender.IsoLevel);
-            _datosRender.ComputeShader.SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
+            int kernel = _datosRender.ComputeShader().FindKernel("March");
+            _datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
+            _datosRender.ComputeShader().SetBuffer(kernel, "datos", datosBuffer);
+            _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
+            _datosRender.ComputeShader().SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
 
-            _datosRender.ComputeShader.Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
+            _datosRender.ComputeShader().Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
         }
 
         private void Render()

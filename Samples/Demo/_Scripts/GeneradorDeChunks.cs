@@ -10,6 +10,7 @@ public class GeneradorDeChunks : MonoBehaviour
     [SerializeField] private Vector3 _dimensionDeChunk;
     [SerializeField] private Vector3Int _puntosPorEje;
     [SerializeField] private int _cantidadDeChunkPorFrame = 10;
+    [SerializeField] private DatosRender _datosRender;
 
     private IEnumerator Start()
     {
@@ -33,7 +34,7 @@ public class GeneradorDeChunks : MonoBehaviour
 
                 chunk.AddComponent<MeshFilter>();
                 MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
-                meshFilter.mesh = MarchingCubes.CrearMesh(generador, 0.5f);
+                meshFilter.mesh = MarchingCubes.CrearMesh(generador, _datosRender);
                 chunk.AddComponent<MeshRenderer>();
 
                 contador++;
