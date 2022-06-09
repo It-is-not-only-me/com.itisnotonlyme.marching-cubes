@@ -5,10 +5,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
     public interface IObtenerDatos
     {
-        public Vector3Int Dimension { get; }
+        public Bounds Bounds { get; }
 
-        public int Id { get; }
+        public Vector3Int NumeroDePuntosPorEje { get; }
 
-        public IEnumerable<Dato> GetDatos();
+        public Dato[] GetDatos();
     }
 }
