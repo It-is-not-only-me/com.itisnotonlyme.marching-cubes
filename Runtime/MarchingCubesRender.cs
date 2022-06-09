@@ -16,12 +16,12 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private GenerarDatos _generador;
 
         private int _cantidadDeFloatDatos = 6;
-        private int _cantidadDeFloatTriangulos = 9;
+        private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3;
         private int _triangulosPorDato = 5;
 
         private void Awake()
         {
-            Material nuevoMaterial = new Material(_datosRender.GeometryShader);
+            Material nuevoMaterial = new Material(_datosRender.GeometryShader());
             nuevoMaterial?.CopyPropertiesFromMaterial(_material);
             _material = nuevoMaterial;
             CrearArgBuffer();
@@ -67,15 +67,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
             Dispatch(puntosPorEje, datosBuffer, triangulosBuffer);
         }
 
-        public void Dispatch(Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
+        private void Dispatch(Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
         {
-            int kernel = _datosRender.ComputeShader.FindKernel("March");
-            _datosRender.ComputeShader.SetBuffer(kernel, "triangles", triangulosBuffer);
-            _datosRender.ComputeShader.SetBuffer(kernel, "datos", datosBuffer);
-            _datosRender.ComputeShader.SetFloats("isoLevel", _datosRender.IsoLevel);
-            _datosRender.ComputeShader.SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
+            int kernel = _datosRender.ComputeShader().FindKernel("March");
+            _datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
+            _datosRender.ComputeShader().SetBuffer(kernel, "datos", datosBuffer);
+            _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
+            _datosRender.ComputeShader().SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
 
-            _datosRender.ComputeShader.Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
+            _datosRender.ComputeShader().Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
         }
 
         private void Render()

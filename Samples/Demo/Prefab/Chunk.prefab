@@ -45,9 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f82ed759f24012479b954a25d98d7b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tamanioX: 30
-  _tamanioY: 20
-  _tamanioZ: 30
   _actualizar: 1
 --- !u!114 &4589823560680067385
 MonoBehaviour:
@@ -62,4 +59,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 0267b7cc8e4f0014d8d6d6cae9d6e0e8, type: 2}
-  _datosRender: {fileID: 11400000, guid: 0f0e9e717a5805447b3741b227534715, type: 2}
+  _datosRender: {fileID: 11400000, guid: 1fbb6e4322bf90b4daed772421a66a8f, type: 2}
