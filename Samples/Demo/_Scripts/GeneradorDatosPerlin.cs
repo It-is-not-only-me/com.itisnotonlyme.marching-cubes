@@ -35,7 +35,6 @@ public class GeneradorDatosPerlin : GenerarDatos
         _actualizar = true;
 
         Vector3 size = (NumeroDePuntosPorEje - Vector3.one) / 2;
-        Debug.Log(size);    
         _bounds = new Bounds(transform.position, size);
         GenerarDatos();
     }
