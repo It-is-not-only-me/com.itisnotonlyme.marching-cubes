@@ -5,14 +5,14 @@ namespace ItIsNotOnlyMe.MarchingCubes
     public struct Dato
     {
         public Vector3 Posicion;
-        public Vector2 UV;
+        public Vector2 Uv;
         public float Valor;
 
         public Dato(Vector3 posicion, float valor, Vector2 uv)
         {
             Posicion = posicion;
             Valor = valor;
-            UV = uv;
+            Uv = uv;
         }
 
         public Dato(Vector3 posicion, float valor)
