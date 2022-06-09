@@ -39,6 +39,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 					default: return uvC;
 				}
 			}
+
+			public Vector3 GetNormales() => (Vector3.Cross(vertexB - vertexA, vertexC - vertexA)).normalized;
 		}
 
 		public static Mesh CrearMesh(IObtenerDatos obtenerDatos, IDatoRender datosRender)
@@ -55,26 +57,32 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
 			Dispatch(datosRender, puntosPorEje, datosBuffer, triangulosBuffer);
 
-			ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
-			ComputeBuffer.CopyCount(triangulosBuffer, countBuffer, 0);
-			int[] triCountArray = { 0 };
-			countBuffer.GetData(triCountArray);
-			int numTris = triCountArray[0];
-
-			Triangle[] triangulos = new Triangle[numTris];
-			triangulosBuffer.GetData(triangulos);
-
+			Triangle[] triangulos = RecuperarTriangulos(triangulosBuffer);
 			Mesh meshResultado = GenerarMesh(triangulos);
 
 			datosBuffer.Dispose();
 			triangulosBuffer.Dispose();
-			countBuffer.Dispose();
-
 
 			return meshResultado;
 		}
 
-		public static void Dispatch(IDatoRender datosRender, Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
+		private static Triangle[] RecuperarTriangulos(ComputeBuffer triangulosBuffer)
+        {
+			ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
+			ComputeBuffer.CopyCount(triangulosBuffer, countBuffer, 0);
+			int[] triCountArray = { 0 };
+			countBuffer.GetData(triCountArray);
+			int numTriangulos = triCountArray[0];
+
+			Triangle[] triangulos = new Triangle[numTriangulos];
+			triangulosBuffer.GetData(triangulos);
+
+			countBuffer.Dispose();
+
+			return triangulos;
+		}
+
+		private static void Dispatch(IDatoRender datosRender, Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
 		{
 			int kernel = datosRender.ComputeShader().FindKernel("March");
 			datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
@@ -94,6 +102,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			List<Vector3> vertices = new List<Vector3>();
 			List<int> indiceTriangulos = new List<int>();
 			List<Vector2> uv = new List<Vector2>();
+			List<Vector3> normales = new List<Vector3>();
 
 			for (int i = 0; i < triangulos.Length; i++)
 				for (int j = 0; j < 3; j++)
@@ -101,13 +110,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
 					indiceTriangulos.Add(vertices.Count);
 					vertices.Add(triangulos[i].GetVertice(j));
 					uv.Add(triangulos[i].GetUv(j));
+					normales.Add(-triangulos[i].GetNormales());
 				}
 
 			meshResultado.SetVertices(vertices);
 			meshResultado.SetTriangles(indiceTriangulos, subMesh);
 			meshResultado.SetUVs(uvChannel, uv);
-
-			meshResultado.RecalculateNormals();
+			meshResultado.SetNormals(normales);
 
 			return meshResultado;
 		}

@@ -6,11 +6,18 @@ using ItIsNotOnlyMe.MarchingCubes;
 public class GeneradorDeChunks : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
+
+    [Space]
+
     [SerializeField] private int _radio;
     [SerializeField] private Vector3 _dimensionDeChunk;
     [SerializeField] private Vector3Int _puntosPorEje;
+
+    [Space]
+
     [SerializeField] private int _cantidadDeChunkPorFrame = 10;
     [SerializeField] private DatosRender _datosRender;
+    [SerializeField] private bool _meshLocal;
 
     private IEnumerator Start()
     {
@@ -32,14 +39,23 @@ public class GeneradorDeChunks : MonoBehaviour
                     yield return null;
                 }
 
-                chunk.AddComponent<MeshFilter>();
-                MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
-                meshFilter.mesh = MarchingCubes.CrearMesh(generador, _datosRender);
-                chunk.AddComponent<MeshRenderer>();
+                if (_meshLocal)
+                    AgregarMeshLocal(chunk, generador);
 
                 contador++;
             }
-
         }
+    }
+
+    private void AgregarMeshLocal(GameObject chunk, GeneradorDatosPerlin generador)
+    {
+        chunk.AddComponent<MeshFilter>();
+        MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
+        meshFilter.mesh = MarchingCubes.CrearMesh(generador, _datosRender);
+
+        chunk.AddComponent<MeshCollider>();
+
+        MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
+        meshCollider.sharedMesh = meshFilter.mesh;
     }
 }
