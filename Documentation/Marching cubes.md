@@ -1,10 +1,11 @@
 # Documentacion
 ---
 
-Esta dividido en 3 clases/struct
+Esta dividido en 4 clases/struct
  * MarchingCubesRenderer
  * GeneradorDatos
  * Dato
+ * MarchingCubes (static)
 
 ### MarchingCubesRenderer y GeneradorDatos
 ---
@@ -14,3 +15,7 @@ Estos datos serian un array tridimencional comprimido a un vector unidimencional
 ### Datos
 ---
 Este struct es lo que se va a mandar por GeneradorDatos, que seria una posicion, un valor (valor que usa el algoritmo para determinar si esta debajo de la superficie o no), y por ultimo una coordenada uv, usada para lo que se quiera.
+
+### MarchingCubes
+---
+Es una herramienta para generar la misma mesh, de la misma forma que la anterior pero obteniendo la mesh generada para usarlo en la cpu. Se puede usar como una meshCollider, pero hay que tener en cuenta que tiene que ser covexa para que funcione las colisiones, entonces recomendacion es que sea lo mas chica posible si se usa para ese motivo.
