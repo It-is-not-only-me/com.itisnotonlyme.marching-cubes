@@ -14,7 +14,7 @@ public class GeneradorDatosPerlin : GenerarDatos
         get 
         {
             bool necesitaActualizar = _actualizar;
-            if (_actualizar) _actualizar = false;
+            _actualizar &= false;
             return necesitaActualizar; 
         }
     }
@@ -23,7 +23,7 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     private uint _tamanioX, _tamanioY, _tamanioZ;
     private Dato[] _datos;
-    private float _noiseScale;
+    private float _noiseScale = 0.05f;
     private Bounds _bounds;
 
     public void Inicializar(Vector3 posicion, Vector3Int dimension)
@@ -33,7 +33,9 @@ public class GeneradorDatosPerlin : GenerarDatos
         _tamanioY = (uint)dimension.y;
         _tamanioZ = (uint)dimension.z;
         _actualizar = true;
-        Vector3 size = NumeroDePuntosPorEje / 2;
+
+        Vector3 size = (NumeroDePuntosPorEje - Vector3.one) / 2;
+        Debug.Log(size);    
         _bounds = new Bounds(transform.position, size);
         GenerarDatos();
     }
@@ -56,13 +58,12 @@ public class GeneradorDatosPerlin : GenerarDatos
                     Vector3 posicion = new Vector3(i, j, k) + _bounds.center - _bounds.size;
                     float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + 200, posicion.z * _noiseScale + 200);
                     float valor = valorPerlin * _tamanioY - j;
-                    _datos[contador].CargarDatos(posicion, valor);
-                    contador++;
+                    _datos[contador++].CargarDatos(posicion, valor);
                 }
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(_bounds.center, _bounds.size);
+        Gizmos.DrawWireCube(_bounds.center, _bounds.size * 2);
     }
 }

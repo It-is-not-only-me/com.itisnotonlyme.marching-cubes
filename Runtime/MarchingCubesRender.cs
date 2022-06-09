@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
@@ -21,8 +22,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void Awake()
         {
             Material nuevoMaterial = new Material(_datosRender.GeometryShader);
-            if (_material != null)
-                nuevoMaterial.CopyPropertiesFromMaterial(_material);
+            nuevoMaterial?.CopyPropertiesFromMaterial(_material);
             _material = nuevoMaterial;
             CrearArgBuffer();
 
@@ -36,7 +36,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void OnDestroy()
         {
-            if (_argBuffer != null) _argBuffer.Dispose();
+            _argBuffer?.Dispose();
             _bufferManager.Destruir();
         }
 
@@ -64,6 +64,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int triangulosCount = datosCount * _triangulosPorDato;
             ComputeBuffer triangulosBuffer = _bufferManager.ObtenerTriangulosBuffer(triangulosCount);
 
+            Dispatch(puntosPorEje, datosBuffer, triangulosBuffer);
+        }
+
+        public void Dispatch(Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
+        {
             int kernel = _datosRender.ComputeShader.FindKernel("March");
             _datosRender.ComputeShader.SetBuffer(kernel, "triangles", triangulosBuffer);
             _datosRender.ComputeShader.SetBuffer(kernel, "datos", datosBuffer);
@@ -71,7 +76,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader.SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
 
             _datosRender.ComputeShader.Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
-            datosBuffer.Dispose();
         }
 
         private void Render()

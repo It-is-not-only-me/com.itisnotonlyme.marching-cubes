@@ -20,7 +20,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             if (DatosBuffer == null || _cantidadDatosActual < cantidad)
             {
-                CrearDatosBuffer(cantidad);
+                DatosBuffer = CrearDatosBuffer(cantidad);
                 _cantidadDatosActual = cantidad;
             }
             DatosBuffer.SetCounterValue((uint)(_cantidadDatosActual - cantidad));
@@ -28,18 +28,17 @@ namespace ItIsNotOnlyMe.MarchingCubes
             return DatosBuffer;
         }
 
-        private void CrearDatosBuffer(int cantidad)
+        private ComputeBuffer CrearDatosBuffer(int cantidad)
         {
-            if (DatosBuffer != null)
-                DatosBuffer.Dispose();
-            DatosBuffer = new ComputeBuffer(cantidad, _strideDatos);
+            DatosBuffer?.Dispose();
+            return new ComputeBuffer(cantidad, _strideDatos);
         }
 
         public ComputeBuffer ObtenerTriangulosBuffer(int cantidad)
         {
             if (TriangulosBuffer == null || _cantidadTriangulosActual < cantidad)
             {
-                CrearTriangulosBuffer(cantidad);
+                TriangulosBuffer = CrearTriangulosBuffer(cantidad);
                 _cantidadTriangulosActual = cantidad;
             }
             TriangulosBuffer.SetCounterValue(0);
@@ -47,17 +46,17 @@ namespace ItIsNotOnlyMe.MarchingCubes
             return TriangulosBuffer;
         }
 
-        private void CrearTriangulosBuffer(int cantidad)
+        private ComputeBuffer CrearTriangulosBuffer(int cantidad)
         {
-            if (TriangulosBuffer != null)
-                TriangulosBuffer.Dispose();
-            TriangulosBuffer = new ComputeBuffer(cantidad, _strideTriangulos);
+
+            TriangulosBuffer?.Dispose();
+            return new ComputeBuffer(cantidad, _strideTriangulos, ComputeBufferType.Append);
         }
         
         public void Destruir()
         {
-            if (TriangulosBuffer != null) TriangulosBuffer.Dispose();
-            if (DatosBuffer != null) DatosBuffer.Dispose();
+            TriangulosBuffer?.Dispose();
+            DatosBuffer?.Dispose();
         }
     }
 }
