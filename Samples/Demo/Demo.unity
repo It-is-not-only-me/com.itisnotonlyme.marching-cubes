@@ -346,6 +346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 4044685854255544995, guid: 281cd95fcf2345344860a30c802c04d2, type: 3}
-  _radio: 50
-  _dimensionDeChunk: {x: 20, y: 20, z: 20}
-  _cantidadDeChunkPorFrame: 25
+  _radio: 20
+  _dimensionDeChunk: {x: 60, y: 60, z: 60}
+  _puntosPorEje: {x: 10, y: 10, z: 10}
+  _cantidadDeChunkPorFrame: 20

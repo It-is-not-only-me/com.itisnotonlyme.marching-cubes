@@ -26,16 +26,15 @@ public class GeneradorDatosPerlin : GenerarDatos
     private float _noiseScale = 0.05f;
     private Bounds _bounds;
 
-    public void Inicializar(Vector3 posicion, Vector3Int dimension)
+    public void Inicializar(Vector3 posicion, Vector3 ancho, Vector3Int puntoPorEje)
     {
         transform.position = posicion;
-        _tamanioX = (uint)dimension.x;
-        _tamanioY = (uint)dimension.y;
-        _tamanioZ = (uint)dimension.z;
+        _tamanioX = (uint)puntoPorEje.x;
+        _tamanioY = (uint)puntoPorEje.y;
+        _tamanioZ = (uint)puntoPorEje.z;
         _actualizar = true;
 
-        Vector3 size = (NumeroDePuntosPorEje - Vector3.one) / 2;
-        _bounds = new Bounds(transform.position, size);
+        _bounds = new Bounds(posicion, ancho);
         GenerarDatos();
     }
 
@@ -54,7 +53,11 @@ public class GeneradorDatosPerlin : GenerarDatos
             for (int j = 0; j < puntosPorEje.y; j++)
                 for (int k = 0; k < puntosPorEje.z; k++)
                 {
-                    Vector3 posicion = new Vector3(i, j, k) + _bounds.center - _bounds.size;
+                    float x = Mathf.Lerp(0, _bounds.size.x * 2, ((float)i) / (puntosPorEje.x - 1));
+                    float y = Mathf.Lerp(0, _bounds.size.y * 2, ((float)j) / (puntosPorEje.y - 1));
+                    float z = Mathf.Lerp(0, _bounds.size.z * 2, ((float)k) / (puntosPorEje.z - 1));
+
+                    Vector3 posicion = new Vector3(x, y, z) + _bounds.center - _bounds.size;
                     float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + 200, posicion.z * _noiseScale + 200);
                     float valor = valorPerlin * _tamanioY - j;
                     _datos[contador++].CargarDatos(posicion, valor);

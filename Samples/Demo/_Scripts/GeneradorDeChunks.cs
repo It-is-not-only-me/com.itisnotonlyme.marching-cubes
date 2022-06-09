@@ -7,7 +7,8 @@ public class GeneradorDeChunks : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
     [SerializeField] private int _radio;
-    [SerializeField] private Vector3Int _dimensionDeChunk;
+    [SerializeField] private Vector3 _dimensionDeChunk;
+    [SerializeField] private Vector3Int _puntosPorEje;
     [SerializeField] private int _cantidadDeChunkPorFrame = 10;
 
     private IEnumerator Start()
@@ -20,8 +21,9 @@ public class GeneradorDeChunks : MonoBehaviour
                 GameObject chunk = Instantiate(_prefab, transform);
                 GeneradorDatosPerlin generador = chunk.GetComponent<GeneradorDatosPerlin>();
 
-                Vector3 posicion = transform.position + Vector3.right * (i - 1 / 2) * _dimensionDeChunk.x + Vector3.forward * (k - 1 / 2) * _dimensionDeChunk.z;
-                generador.Inicializar(posicion, _dimensionDeChunk);
+                Vector3 posicion = transform.position + Vector3.right * (i - 1 / 2) * _dimensionDeChunk.x * 2 + Vector3.forward * (k - 1 / 2) * _dimensionDeChunk.z * 2;
+                
+                generador.Inicializar(posicion, _dimensionDeChunk, _puntosPorEje);
 
                 if (contador >= _cantidadDeChunkPorFrame)
                 {
