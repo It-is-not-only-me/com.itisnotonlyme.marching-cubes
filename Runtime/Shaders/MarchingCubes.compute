@@ -84,15 +84,9 @@ void March(int3 id : SV_DispatchThreadID)
     // A value of 0 means cube is entirely inside surface; 255 entirely outside.
     // The value is used to look up the edge table, which indicates which edges of the cube are cut by the isosurface.
     int cubeIndex = 0;
-    if (cubeCorners[0].w < isoLevel) cubeIndex |= 1;
-    if (cubeCorners[1].w < isoLevel) cubeIndex |= 2;
-    if (cubeCorners[2].w < isoLevel) cubeIndex |= 4;
-    if (cubeCorners[3].w < isoLevel) cubeIndex |= 8;
-    if (cubeCorners[4].w < isoLevel) cubeIndex |= 16;
-    if (cubeCorners[5].w < isoLevel) cubeIndex |= 32;
-    if (cubeCorners[6].w < isoLevel) cubeIndex |= 64;
-    if (cubeCorners[7].w < isoLevel) cubeIndex |= 128;
-
+    for (int j = 0, nivel = 1; j < 8; j++, nivel *= 2) {
+        cubeIndex |= nivel * (cubeCorners[j].w < isoLevel);
+    }
     // Create triangles for current cube configuration
     for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3) {
         // Get indices of corner points A and B for each of the three edges
