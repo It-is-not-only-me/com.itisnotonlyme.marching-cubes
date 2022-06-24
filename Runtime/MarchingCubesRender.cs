@@ -75,7 +75,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
             _datosRender.ComputeShader().SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
 
-            _datosRender.ComputeShader().Dispatch(kernel, puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
+            _datosRender.ComputeShader().Dispatch(kernel, puntosPorEje.x - 1, puntosPorEje.y - 1, puntosPorEje.z -1);
         }
 
         private void Render()

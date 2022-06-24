@@ -34,7 +34,7 @@ public class GeneradorDatosPerlin : GenerarDatos
         _tamanioZ = (uint)puntoPorEje.z;
         _actualizar = true;
 
-        _bounds = new Bounds(posicion, ancho);
+        _bounds = new Bounds(posicion, ancho * 2);
         GenerarDatos();
     }
 
@@ -57,15 +57,31 @@ public class GeneradorDatosPerlin : GenerarDatos
                     float y = Mathf.Lerp(0, _bounds.size.y * 2, ((float)j) / (puntosPorEje.y - 1));
                     float z = Mathf.Lerp(0, _bounds.size.z * 2, ((float)k) / (puntosPorEje.z - 1));
 
-                    Vector3 posicion = new Vector3(x, y, z) + _bounds.center - _bounds.size;
-                    float valorPerlin = Mathf.PerlinNoise(posicion.x * _noiseScale + 200, posicion.z * _noiseScale + 200);
-                    float valor = valorPerlin * _tamanioY - j;
+                    Vector3 posicion = new Vector3(x, y, z) + Bounds.center - (Bounds.size / 2);
+
+                    Vector3 posicionPerlin = posicion * _noiseScale + Vector3.one * 200;
+                    float valor = Perlin3D(posicionPerlin);
                     _datos[contador++].CargarDatos(posicion, valor);
                 }
     }
 
+    private float Perlin3D(Vector3 posicion)
+    {
+        float x = posicion.x, y = posicion.y, z = posicion.z;
+
+        float XY = Mathf.PerlinNoise(x, y);
+        float YZ = Mathf.PerlinNoise(y, z);
+        float ZX = Mathf.PerlinNoise(z, x);
+
+        float YX = Mathf.PerlinNoise(y, z);
+        float ZY = Mathf.PerlinNoise(z, y);
+        float XZ = Mathf.PerlinNoise(x, z);
+
+        return (XY + YZ + ZX + YX + ZY + XZ) / 6f;
+    }
+
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(_bounds.center, _bounds.size * 2);
+        Gizmos.DrawWireCube(Bounds.center, Bounds.size);
     }
 }
