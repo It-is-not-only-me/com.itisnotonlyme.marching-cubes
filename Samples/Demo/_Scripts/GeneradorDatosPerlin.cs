@@ -26,7 +26,7 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     public void Inicializar(Vector3 posicion, Vector3 ancho, Vector3Int puntoPorEje)
     {
-        transform.position = posicion;
+        transform.position = Vector3.zero;
         _tamanioX = (uint)puntoPorEje.x;
         _tamanioY = (uint)puntoPorEje.y;
         _tamanioZ = (uint)puntoPorEje.z;
