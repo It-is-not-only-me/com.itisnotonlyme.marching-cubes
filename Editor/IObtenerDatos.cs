@@ -10,5 +10,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         public Vector3Int NumeroDePuntosPorEje { get; }
 
         public Dato[] GetDatos();
+
+        
     }
 }

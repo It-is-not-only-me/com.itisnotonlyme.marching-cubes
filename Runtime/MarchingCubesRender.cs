@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
-    [AddComponentMenu("Marching cubes/Camara manager")]
+    [AddComponentMenu("Marching cubes/Marching cubes renderer")]
     public class MarchingCubesRender : MonoBehaviour
     {
         [SerializeField] private Material _material;
