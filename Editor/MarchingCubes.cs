@@ -49,8 +49,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
 			Vector3Int puntosPorEje = obtenerDatos.NumeroDePuntosPorEje;
 			int datosCount = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
+			MarchingCubeMesh mesh = obtenerDatos.MarchingCubeMesh;
+			
 			datosBuffer = new ComputeBuffer(datosCount, _cantidadDeFloatDatos * sizeof(float));
-			datosBuffer.SetData(obtenerDatos.GetDatos());
+			datosBuffer.SetData(mesh.Datos);
 
 			int triangulosCount = datosCount * _triangulosPorDato;
 			triangulosBuffer = new ComputeBuffer(triangulosCount, _cantidadDeFloatTriangulos * sizeof(float), ComputeBufferType.Append);

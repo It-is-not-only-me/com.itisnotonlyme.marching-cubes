@@ -5,9 +5,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
     public abstract class GenerarDatos : MonoBehaviour, IObtenerDatos
     {
-        public abstract Bounds Bounds { get; }
+        public abstract MarchingCubeMesh MarchingCubeMesh { get; }
         public abstract Vector3Int NumeroDePuntosPorEje { get; }
         public abstract bool Actualizar { get; }
-        public abstract Dato[] GetDatos();
     }
 }

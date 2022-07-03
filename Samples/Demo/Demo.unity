@@ -348,7 +348,7 @@ MonoBehaviour:
   _prefab: {fileID: 4044685854255544995, guid: 281cd95fcf2345344860a30c802c04d2, type: 3}
   _radio: 5
   _dimensionDeChunk: {x: 10, y: 30, z: 10}
-  _puntosPorEje: {x: 30, y: 90, z: 30}
+  _puntosPorEje: {x: 10, y: 30, z: 10}
   _cantidadDeChunkPorFrame: 20
   _datosRender: {fileID: 11400000, guid: 1fbb6e4322bf90b4daed772421a66a8f, type: 2}
   _meshLocal: 0

@@ -6,14 +6,16 @@ namespace ItIsNotOnlyMe.MarchingCubes
     {
         public ComputeBuffer TriangulosBuffer { get; private set; }
         public ComputeBuffer DatosBuffer { get; private set; }
+        public ComputeBuffer IndicesBuffer { get; private set; }
 
-        private int _cantidadDatosActual, _cantidadTriangulosActual;
-        private int _strideDatos, _strideTriangulos;
+        private int _cantidadDatosActual, _cantidadTriangulosActual, _cantidadIndicesActual;
+        private int _strideDatos, _strideTriangulos, _strideIndices;
 
-        public BufferManager(int strideDatos, int strideTriangulos)
+        public BufferManager(int strideDatos, int strideTriangulos, int strideIndices)
         {
             _strideDatos = strideDatos;
             _strideTriangulos = strideTriangulos;
+            _strideIndices = strideIndices;
         }
 
         public ComputeBuffer ObtenerDatosBuffer(int cantidad)
@@ -53,10 +55,30 @@ namespace ItIsNotOnlyMe.MarchingCubes
             return new ComputeBuffer(cantidad, _strideTriangulos, ComputeBufferType.Append);
         }
         
+        public ComputeBuffer ObtenerIndicesBuffer(int cantidad)
+        {
+            if (IndicesBuffer == null || _cantidadIndicesActual < cantidad)
+            {
+                IndicesBuffer = CrearIndicesBuffer(cantidad);
+                _cantidadTriangulosActual = cantidad;
+            }
+            IndicesBuffer.SetCounterValue(0);
+
+            return IndicesBuffer;
+        }
+
+        private ComputeBuffer CrearIndicesBuffer(int cantidad)
+        {
+
+            IndicesBuffer?.Dispose();
+            return new ComputeBuffer(cantidad, _strideIndices);
+        }
+
         public void Destruir()
         {
             TriangulosBuffer?.Dispose();
             DatosBuffer?.Dispose();
+            IndicesBuffer?.Dispose();
         }
     }
 }

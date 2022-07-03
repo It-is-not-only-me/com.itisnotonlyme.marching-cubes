@@ -15,8 +15,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private BufferManager _bufferManager;
         private GenerarDatos _generador;
 
-        private int _cantidadDeFloatDatos = 6;
-        private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3;
+        private int _cantidadDeFloatDatos = 4;
+        private int _cantidadDeFloatTriangulos = 3 * 3;
         private int _triangulosPorDato = 5;
 
         private void Awake()
@@ -28,8 +28,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             int datosStride = _cantidadDeFloatDatos * sizeof(float);
             int triangulosStride = _cantidadDeFloatTriangulos * sizeof(float);
+            int indicesStride = sizeof(int);
 
-            _bufferManager = new BufferManager(datosStride, triangulosStride);
+            _bufferManager = new BufferManager(datosStride, triangulosStride, indicesStride);
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
         }
@@ -58,24 +59,31 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             Vector3Int puntosPorEje = _generador.NumeroDePuntosPorEje;
             int datosCount = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
+            MarchingCubeMesh mesh = _generador.MarchingCubeMesh;
+
             ComputeBuffer datosBuffer = _bufferManager.ObtenerDatosBuffer(datosCount);
-            datosBuffer.SetData(_generador.GetDatos());
+            datosBuffer.SetData(mesh.Datos);
 
             int triangulosCount = datosCount * _triangulosPorDato;
             ComputeBuffer triangulosBuffer = _bufferManager.ObtenerTriangulosBuffer(triangulosCount);
 
-            Dispatch(puntosPorEje, datosBuffer, triangulosBuffer);
+            int cantidadDeindices = ((puntosPorEje.x - 1) * (puntosPorEje.y - 1) * (puntosPorEje.z - 1)) * 8;
+            ComputeBuffer indicesBuffer = _bufferManager.ObtenerIndicesBuffer(cantidadDeindices);
+            indicesBuffer.SetData(mesh.Indices);
+
+            Dispatch(datosBuffer, indicesBuffer, triangulosBuffer);
         }
 
-        private void Dispatch(Vector3Int puntosPorEje, ComputeBuffer datosBuffer, ComputeBuffer triangulosBuffer)
+        private void Dispatch(ComputeBuffer datosBuffer, ComputeBuffer indicesBuffer, ComputeBuffer triangulosBuffer)
         {
             int kernel = _datosRender.ComputeShader().FindKernel("March");
             _datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "datos", datosBuffer);
+            _datosRender.ComputeShader().SetBuffer(kernel, "indices", indicesBuffer);
             _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
-            _datosRender.ComputeShader().SetInts("numPointsPerAxis", puntosPorEje.x, puntosPorEje.y, puntosPorEje.z);
 
-            _datosRender.ComputeShader().Dispatch(kernel, puntosPorEje.x - 1, puntosPorEje.y - 1, puntosPorEje.z - 1);
+            int cantidadIndices = indicesBuffer.count / 8;
+            _datosRender.ComputeShader().Dispatch(kernel, cantidadIndices, 1, 1);
         }
 
         private void Render()
@@ -88,7 +96,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
 
-            Graphics.DrawProceduralIndirect(_material, _generador.Bounds, MeshTopology.Points, _argBuffer);
+            Graphics.DrawProceduralIndirect(_material, _generador.MarchingCubeMesh.Limites, MeshTopology.Points, _argBuffer);
         }
     }
 }

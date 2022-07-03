@@ -5,12 +5,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
     public interface IObtenerDatos
     {
-        public Bounds Bounds { get; }
+        public MarchingCubeMesh MarchingCubeMesh { get; }
 
         public Vector3Int NumeroDePuntosPorEje { get; }
-
-        public Dato[] GetDatos();
-
-        
     }
 }
