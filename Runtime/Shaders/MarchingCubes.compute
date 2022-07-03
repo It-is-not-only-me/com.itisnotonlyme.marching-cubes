@@ -64,15 +64,17 @@ float4 colorAtIndex(int i) {
 [numthreads(numThreads, 1, 1)]
 void March(int3 id : SV_DispatchThreadID) {
 
+    int indice = (id.x + id.y + id.z) * 8;
+
     float4 cubeCorners[8] = {
-        pointAtIndex(indices[(id.x * 8)]),  
-        pointAtIndex(indices[(id.x * 8) + 1]),
-        pointAtIndex(indices[(id.x * 8) + 2]),
-        pointAtIndex(indices[(id.x * 8) + 3]),
-        pointAtIndex(indices[(id.x * 8) + 4]),
-        pointAtIndex(indices[(id.x * 8) + 5]),
-        pointAtIndex(indices[(id.x * 8) + 6]),
-        pointAtIndex(indices[(id.x * 8) + 7])
+        pointAtIndex(indices[indice]),  
+        pointAtIndex(indices[indice + 1]),
+        pointAtIndex(indices[indice + 2]),
+        pointAtIndex(indices[indice + 3]),
+        pointAtIndex(indices[indice + 4]),
+        pointAtIndex(indices[indice + 5]),
+        pointAtIndex(indices[indice + 6]),
+        pointAtIndex(indices[indice + 7])
     };
 
     /*
