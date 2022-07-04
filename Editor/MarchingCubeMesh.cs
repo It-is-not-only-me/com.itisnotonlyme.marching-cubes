@@ -72,7 +72,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             }
         }
 
-        public Vector2[] Uv2
+        public Vector2[] Uvs2
         {
             get
             {

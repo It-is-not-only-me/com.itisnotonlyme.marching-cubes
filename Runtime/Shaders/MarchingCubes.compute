@@ -3,20 +3,17 @@
 
 static const int numThreads = 1;
 
+struct Vertice {
+    float3 vertex;
+    float2 uv;
+    float2 uv2;
+    float3 color;
+};
+
 struct Triangle {
-    float3 vertexA;
-    float3 vertexB;
-    float3 vertexC;
-    float2 uvA;
-    float2 uvB;
-    float2 uvC;
-    /*
-    float2 uv2A;
-    float2 uv2B;
-    float2 uv2C;
-    float3 colorA;
-    float3 colorB;
-    float3 colorC;*/
+    Vertice verticeA;
+    Vertice verticeB;
+    Vertice verticeC;
 };
 
 struct Dato {
@@ -28,8 +25,8 @@ AppendStructuredBuffer<Triangle> triangles;
 StructuredBuffer<Dato> datos;
 StructuredBuffer<int> indices;
 StructuredBuffer<float2> uvs;
-//StructuredBuffer<float2> uvs2;
-//StructuredBuffer<float4> colores;
+StructuredBuffer<float2> uvs2;
+StructuredBuffer<float4> colores;
 
 int cantidadPorEje;
 int cantidadIndices;
@@ -56,7 +53,6 @@ float3 uvAtIndex(int i) {
     return float3(uv, valor);
 }
 
-/*
 float3 uv2AtIndex(int i) {
     float valor = datos[i].valor;
     float2 uv2 = uvs2[i];
@@ -68,7 +64,6 @@ float4 colorAtIndex(int i) {
     float3 color = colores[i].rgb;
     return float4(color, valor);
 }
-*/
 
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
@@ -79,11 +74,15 @@ void March(int3 id : SV_DispatchThreadID) {
 
     float4 cubeCorners[8];
     float3 uvCorners[8];
+    float3 uv2Corners[8];
+    float4 colorCorners[8];
 
     for (int w = 0; w < 8; w++) {
         int indiceActual = indices[indice + w];
         cubeCorners[w] = pointAtIndex(indiceActual);
         uvCorners[w] = uvAtIndex(indiceActual);
+        uv2Corners[w] = uv2AtIndex(indiceActual);
+        colorCorners[w] = colorAtIndex(indiceActual);
     }
 
     int cubeIndex = 0;
@@ -104,13 +103,27 @@ void March(int3 id : SV_DispatchThreadID) {
 
         Triangle tri;
 
-        tri.vertexA = interpolateFloat4(cubeCorners[a0], cubeCorners[b0]);
-        tri.uvA = interpolateFloat3(uvCorners[a0], uvCorners[b0]);
-        tri.vertexB = interpolateFloat4(cubeCorners[a1], cubeCorners[b1]);
-        tri.uvB = interpolateFloat3(uvCorners[a1], uvCorners[b1]);
-        tri.vertexC = interpolateFloat4(cubeCorners[a2], cubeCorners[b2]);
-        tri.uvC = interpolateFloat3(uvCorners[a2], uvCorners[b2]);
+        Vertice verticeA;
+        verticeA.vertex = interpolateFloat4(cubeCorners[a0], cubeCorners[b0]);
+        verticeA.uv = interpolateFloat3(uvCorners[a0], uvCorners[b0]);
+        verticeA.uv2 = interpolateFloat3(uv2Corners[a0], uv2Corners[b0]);
+        verticeA.color = interpolateFloat4(colorCorners[a0], colorCorners[b0]);
 
+        Vertice verticeB;
+        verticeB.vertex = interpolateFloat4(cubeCorners[a1], cubeCorners[b1]);
+        verticeB.uv = interpolateFloat3(uvCorners[a1], uvCorners[b1]);
+        verticeB.uv2 = interpolateFloat3(uv2Corners[a1], uv2Corners[b1]);
+        verticeB.color = interpolateFloat4(colorCorners[a1], colorCorners[b1]);
+
+        Vertice verticeC;
+        verticeC.vertex = interpolateFloat4(cubeCorners[a2], cubeCorners[b2]);
+        verticeC.uv = interpolateFloat3(uvCorners[a2], uvCorners[b2]);
+        verticeC.uv2 = interpolateFloat3(uv2Corners[a2], uv2Corners[b2]);
+        verticeC.color = interpolateFloat4(colorCorners[a2], colorCorners[b2]);
+
+        tri.verticeA = verticeA;
+        tri.verticeB = verticeB;
+        tri.verticeC = verticeC;
         triangles.Append(tri);
     }
 }

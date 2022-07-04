@@ -7,7 +7,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 	public static class MarchingCubes
 	{
 		static private int _cantidadDeFloatDatos = 6;
-		static private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3;
+		static private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
 		static private int _triangulosPorDato = 5;
 
 		struct Triangle
@@ -19,6 +19,14 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			public Vector2 uvA;
 			public Vector2 uvB;
 			public Vector2 uvC;
+
+			public Vector2 uv2A;
+			public Vector2 uv2B;
+			public Vector2 uv2C;
+
+			public Vector3 colorA;
+			public Vector3 colorB;
+			public Vector3 colorC;
 
 			public Vector3 GetVertice(int i)
 			{
