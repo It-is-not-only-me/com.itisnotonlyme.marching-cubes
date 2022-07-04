@@ -8,8 +8,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
     [AddComponentMenu("Marching cubes/Marching cubes renderer")]
     public class MarchingCubesRender : MonoBehaviour
     {
-        private static int _maxCount = 65535;
-
         [SerializeField] private Material _material;
         [SerializeField] private DatosRender _datosRender;
 
@@ -81,16 +79,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int kernel = _datosRender.ComputeShader().FindKernel("March");
 
             int cantidadIndices = indicesBuffer.count / 8;
-            int cantidadEnX = Mathf.Min(cantidadIndices, _maxCount);
-            //int cantidadEnY = Mathf.Max(1, Mathf.Min(cantidadIndices - _maxCount, _maxCount));
-            //int cantidadEnZ = Mathf.Max(1, Mathf.Min(cantidadIndices - 2 * _maxCount, _maxCount));
+            int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices, 1.0f / 3.0f));
 
             _datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "datos", datosBuffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "indices", indicesBuffer);
+            _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());            
 
-            _datosRender.ComputeShader().Dispatch(kernel, cantidadEnX, 1, 1);
+            _datosRender.ComputeShader().Dispatch(kernel, cantidadPorEjes, cantidadPorEjes, cantidadPorEjes);
         }
 
         private void Render()
