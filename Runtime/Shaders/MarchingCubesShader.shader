@@ -23,17 +23,19 @@ Shader "MarchingCubes/Render"
 
             #include "UnityCG.cginc"
 
-            struct Vertice {
-                float3 vertex;
-                float2 uv;
-                float2 uv2;
-                float3 color;
-            };
-
             struct Triangle {
-                Vertice verticeA;
-                Vertice verticeB;
-                Vertice verticeC;
+                float3 vertexA;
+                float2 uvA;
+                float2 uv2A;
+                float3 colorA;
+                float3 vertexB;
+                float2 uvB;
+                float2 uv2B;
+                float3 colorB;
+                float3 vertexC;
+                float2 uvC;
+                float2 uv2C;
+                float3 colorC;
             };
 
             StructuredBuffer<Triangle> triangulos;
@@ -72,20 +74,20 @@ Shader "MarchingCubes/Render"
 
                 v2g o;
 
-                o.vertexA = float4(triangulo.verticeA.vertex, 1);
-                o.uvA = triangulo.verticeA.uv;
-                o.uv2A = triangulo.verticeA.uv2;
-                o.colorA = triangulo.verticeA.color;
+                o.vertexA = float4(triangulo.vertexA, 1);
+                o.uvA = triangulo.uvA;
+                o.uv2A = triangulo.uv2A;
+                o.colorA = triangulo.colorA;
 
-                o.vertexB = float4(triangulo.verticeB.vertex, 1);
-                o.uvB = triangulo.verticeB.uv;
-                o.uv2B = triangulo.verticeB.uv2;
-                o.colorB = triangulo.verticeB.color;
+                o.vertexB = float4(triangulo.vertexB, 1);
+                o.uvB = triangulo.uvB;
+                o.uv2B = triangulo.uv2B;
+                o.colorB = triangulo.colorB;
 
-                o.vertexC = float4(triangulo.verticeC.vertex, 1);
-                o.uvC = triangulo.verticeC.uv;
-                o.uv2C = triangulo.verticeC.uv2;
-                o.colorC = triangulo.verticeC.color;
+                o.vertexC = float4(triangulo.vertexC, 1);
+                o.uvC = triangulo.uvC;
+                o.uv2C = triangulo.uv2C;
+                o.colorC = triangulo.colorC;
 
                 o.normal = -normalize(cross(o.vertexB.xyz - o.vertexA.xyz, o.vertexC.xyz - o.vertexA.xyz));
                 

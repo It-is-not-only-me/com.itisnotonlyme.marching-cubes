@@ -104,7 +104,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             int kernel = _datosRender.ComputeShader().FindKernel("March");
 
-            int cantidadIndices = _bufferDatos.Buffer.count;
+            int cantidadIndices = _bufferIndices.Buffer.count;
             int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices / 8, 1.0f / 3.0f));
 
             _datosRender.ComputeShader().SetBuffer(kernel, "triangles", _bufferTriangulos.Buffer);
@@ -116,7 +116,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
-            _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());            
+            _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
 
             _datosRender.ComputeShader().Dispatch(kernel, cantidadPorEjes, cantidadPorEjes, cantidadPorEjes);
         }
