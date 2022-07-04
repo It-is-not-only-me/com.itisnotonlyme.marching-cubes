@@ -41,7 +41,9 @@ public class GeneradorDatosPerlin : GenerarDatos
     private void GenerarMesh()
     {
         Vector3Int puntosPorEje = NumeroDePuntosPorEje;
-        Dato[] datos = new Dato[puntosPorEje.x * puntosPorEje.y * puntosPorEje.z];
+        int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
+        Dato[] datos = new Dato[cantidadDeDatos];
+        Vector2[] uvs = new Vector2[cantidadDeDatos];
 
         int contador = 0;
         for (int i = 0; i < puntosPorEje.x; i++)
@@ -56,9 +58,12 @@ public class GeneradorDatosPerlin : GenerarDatos
                     Vector3 posicionPerlin = posicion * _noiseScale + Vector3.one * 200;
                     float valor = Perlin3D(posicionPerlin);
 
+                    uvs[contador] = new Vector2(i % 2, j % 2);
                     datos[contador++].CargarDatos(posicion, valor);
                 }
+
         _marchingCubeMesh.Datos = datos;
+        _marchingCubeMesh.Uvs = uvs;
 
         int cantidadDeindices = ((puntosPorEje.x - 1) * (puntosPorEje.y - 1) * (puntosPorEje.z - 1)) * 8;
         int[] indices = new int[cantidadDeindices];
@@ -75,6 +80,7 @@ public class GeneradorDatosPerlin : GenerarDatos
                     indices[posicion + 6] = IndicePorEje(i + 1, j + 1, k + 1, puntosPorEje);
                     indices[posicion + 7] = IndicePorEje(i, j + 1, k + 1, puntosPorEje);
                 }
+
         _marchingCubeMesh.Indices = indices;
     }
 

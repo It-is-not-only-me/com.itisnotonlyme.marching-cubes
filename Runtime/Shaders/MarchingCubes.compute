@@ -7,9 +7,16 @@ struct Triangle {
     float3 vertexA;
     float3 vertexB;
     float3 vertexC;
-    //float2 uvA;
-    //float2 uvB;
-    //float2 uvC;
+    float2 uvA;
+    float2 uvB;
+    float2 uvC;
+    /*
+    float2 uv2A;
+    float2 uv2B;
+    float2 uv2C;
+    float3 colorA;
+    float3 colorB;
+    float3 colorC;*/
 };
 
 struct Dato {
@@ -20,11 +27,12 @@ struct Dato {
 AppendStructuredBuffer<Triangle> triangles;
 StructuredBuffer<Dato> datos;
 StructuredBuffer<int> indices;
-//StructuredBuffer<float2> uvs;
+StructuredBuffer<float2> uvs;
 //StructuredBuffer<float2> uvs2;
 //StructuredBuffer<float4> colores;
 
 int cantidadPorEje;
+int cantidadIndices;
 float isoLevel;
 
 float3 interpolateFloat4(float4 v1, float4 v2) {
@@ -42,13 +50,13 @@ float4 pointAtIndex(int i) {
     return float4(dato.posicion, dato.valor);
 }
 
-/*
 float3 uvAtIndex(int i) {
     float valor = datos[i].valor;
     float2 uv = uvs[i];
     return float3(uv, valor);
 }
 
+/*
 float3 uv2AtIndex(int i) {
     float valor = datos[i].valor;
     float2 uv2 = uvs2[i];
@@ -65,36 +73,18 @@ float4 colorAtIndex(int i) {
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
 
-    int indice = id.x + id.y * cantidadPorEje + id.z * cantidadPorEje * cantidadPorEje;
+    int indice = (id.x + id.y * cantidadPorEje + id.z * cantidadPorEje * cantidadPorEje) * 8;
 
-    if (indice >= cantidadPorEje * cantidadPorEje * cantidadPorEje)
-        return;
+    if (indice >= cantidadIndices) return;
 
-    indice *= 8;
+    float4 cubeCorners[8];
+    float3 uvCorners[8];
 
-    float4 cubeCorners[8] = {
-        pointAtIndex(indices[indice]),  
-        pointAtIndex(indices[indice + 1]),
-        pointAtIndex(indices[indice + 2]),
-        pointAtIndex(indices[indice + 3]),
-        pointAtIndex(indices[indice + 4]),
-        pointAtIndex(indices[indice + 5]),
-        pointAtIndex(indices[indice + 6]),
-        pointAtIndex(indices[indice + 7])
-    };
-
-    /*
-    float3 uvCorners[8] = {
-        uvAtIndex(indices[id.x]),
-        uvAtIndex(indices[id.x + 1]),
-        uvAtIndex(indices[id.x + 2]),
-        uvAtIndex(indices[id.x + 3]),
-        uvAtIndex(indices[id.x + 4]),
-        uvAtIndex(indices[id.x + 5]),
-        uvAtIndex(indices[id.x + 6]),
-        uvAtIndex(indices[id.x + 7])
-    };
-    */
+    for (int w = 0; w < 8; w++) {
+        int indiceActual = indices[indice + w];
+        cubeCorners[w] = pointAtIndex(indiceActual);
+        uvCorners[w] = uvAtIndex(indiceActual);
+    }
 
     int cubeIndex = 0;
     for (int j = 0, nivel = 1; j < 8; j++, nivel *= 2) {
@@ -115,11 +105,11 @@ void March(int3 id : SV_DispatchThreadID) {
         Triangle tri;
 
         tri.vertexA = interpolateFloat4(cubeCorners[a0], cubeCorners[b0]);
-        //tri.uvA = interpolateFloat3(uvCorners[a0], uvCorners[b0]);
+        tri.uvA = interpolateFloat3(uvCorners[a0], uvCorners[b0]);
         tri.vertexB = interpolateFloat4(cubeCorners[a1], cubeCorners[b1]);
-        //tri.uvB = interpolateFloat3(uvCorners[a1], uvCorners[b1]);
+        tri.uvB = interpolateFloat3(uvCorners[a1], uvCorners[b1]);
         tri.vertexC = interpolateFloat4(cubeCorners[a2], cubeCorners[b2]);
-        //tri.uvC = interpolateFloat3(uvCorners[a2], uvCorners[b2]);
+        tri.uvC = interpolateFloat3(uvCorners[a2], uvCorners[b2]);
 
         triangles.Append(tri);
     }

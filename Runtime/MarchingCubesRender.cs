@@ -12,12 +12,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer;
-        private BufferManager _bufferManager;
+        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs;
         private GenerarDatos _generador;
 
         private int _cantidadDeFloatDatos = 4;
         private int _cantidadDeFloatTriangulos = 3 * 3;
         private int _triangulosPorDato = 5;
+        private int _cantidadDeFloatUvs = 2;
 
         private void Awake()
         {
@@ -29,8 +30,13 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int datosStride = _cantidadDeFloatDatos * sizeof(float);
             int triangulosStride = _cantidadDeFloatTriangulos * sizeof(float);
             int indicesStride = sizeof(int);
+            int uvsStride = _cantidadDeFloatUvs * sizeof(float);
 
-            _bufferManager = new BufferManager(datosStride, triangulosStride, indicesStride);
+            _bufferDatos = new BufferManager(datosStride, (cantidad, stride) => new ComputeBuffer(cantidad, stride));
+            _bufferTriangulos = new BufferManager(triangulosStride, (cantidad, stride) => new ComputeBuffer(cantidad, stride, ComputeBufferType.Append));
+            _bufferIndices = new BufferManager(indicesStride, (cantidad, stride) => new ComputeBuffer(cantidad, stride));
+            _bufferUvs = new BufferManager(uvsStride, (cantidad, stride) => new ComputeBuffer(cantidad, stride));
+
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
         }
@@ -38,7 +44,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void OnDestroy()
         {
             _argBuffer?.Dispose();
-            _bufferManager.Destruir();
+            _bufferDatos.Destruir();
+            _bufferTriangulos.Destruir();
+            _bufferIndices.Destruir();
+            _bufferUvs.Destruir();
         }
 
         private void Update()
@@ -58,33 +67,39 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void ActualizarDatos()
         {
             Vector3Int puntosPorEje = _generador.NumeroDePuntosPorEje;
-            int datosCount = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
+            int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
             MarchingCubeMesh mesh = _generador.MarchingCubeMesh;
 
-            ComputeBuffer datosBuffer = _bufferManager.ObtenerDatosBuffer(datosCount);
+            ComputeBuffer datosBuffer = _bufferDatos.ObtenerBuffer(cantidadDeDatos);
             datosBuffer.SetData(mesh.Datos);
 
-            int triangulosCount = datosCount * _triangulosPorDato;
-            ComputeBuffer triangulosBuffer = _bufferManager.ObtenerTriangulosBuffer(triangulosCount);
+            int triangulosCount = cantidadDeDatos * _triangulosPorDato;
+            ComputeBuffer triangulosBuffer = _bufferTriangulos.ObtenerBuffer(triangulosCount);
 
             int cantidadDeindices = ((puntosPorEje.x - 1) * (puntosPorEje.y - 1) * (puntosPorEje.z - 1)) * 8;
-            ComputeBuffer indicesBuffer = _bufferManager.ObtenerIndicesBuffer(cantidadDeindices);
+            ComputeBuffer indicesBuffer = _bufferIndices.ObtenerBuffer(cantidadDeindices);
             indicesBuffer.SetData(mesh.Indices);
 
-            Dispatch(datosBuffer, indicesBuffer, triangulosBuffer);
+            int cantidadDeUvs = cantidadDeDatos;
+            ComputeBuffer uvsBuffer = _bufferUvs.ObtenerBuffer(cantidadDeUvs);
+
+            Dispatch(datosBuffer, indicesBuffer, triangulosBuffer, uvsBuffer);
         }
 
-        private void Dispatch(ComputeBuffer datosBuffer, ComputeBuffer indicesBuffer, ComputeBuffer triangulosBuffer)
+        private void Dispatch(ComputeBuffer datosBuffer, ComputeBuffer indicesBuffer, ComputeBuffer triangulosBuffer, ComputeBuffer uvsBuffer)
         {
             int kernel = _datosRender.ComputeShader().FindKernel("March");
 
-            int cantidadIndices = indicesBuffer.count / 8;
-            int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices, 1.0f / 3.0f));
+            int cantidadIndices = indicesBuffer.count;
+            int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices / 8, 1.0f / 3.0f));
 
             _datosRender.ComputeShader().SetBuffer(kernel, "triangles", triangulosBuffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "datos", datosBuffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "indices", indicesBuffer);
+            _datosRender.ComputeShader().SetBuffer(kernel, "uvs", uvsBuffer);
+
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
+            _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
             _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());            
 
             _datosRender.ComputeShader().Dispatch(kernel, cantidadPorEjes, cantidadPorEjes, cantidadPorEjes);
@@ -92,7 +107,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Render()
         {
-            ComputeBuffer triangulosBuffer = _bufferManager.TriangulosBuffer;
+            ComputeBuffer triangulosBuffer = _bufferTriangulos.Buffer;
             int[] args = new int[] { 0, 1, 0, 0 };
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);

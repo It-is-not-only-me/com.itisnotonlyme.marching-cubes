@@ -58,12 +58,12 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         }
 
-        public Vector2[] Uv
+        public Vector2[] Uvs
         {
             get
             {
                 if (_uv == null)
-                    _uv = new Vector2[Indices.Length];
+                    _uv = new Vector2[Datos.Length];
                 return _uv;
             }
             set
@@ -77,7 +77,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             get
             {
                 if (_uv2 == null)
-                    _uv2 = new Vector2[Indices.Length];
+                    _uv2 = new Vector2[Datos.Length];
                 return _uv2;
             }
             set
@@ -91,7 +91,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             get
             {
                 if (_colores == null)
-                    _colores = new Color[Indices.Length];
+                    _colores = new Color[Datos.Length];
                 return _colores;
             }
             set
