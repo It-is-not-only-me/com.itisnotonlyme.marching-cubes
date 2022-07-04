@@ -1,62 +1,48 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
     public class BufferManager
     {
-        public ComputeBuffer TriangulosBuffer { get; private set; }
-        public ComputeBuffer DatosBuffer { get; private set; }
+        private static uint _startCount = 0;
 
-        private int _cantidadDatosActual, _cantidadTriangulosActual;
-        private int _strideDatos, _strideTriangulos;
-
-        public BufferManager(int strideDatos, int strideTriangulos)
+        public ComputeBuffer Buffer
         {
-            _strideDatos = strideDatos;
-            _strideTriangulos = strideTriangulos;
+            get => _buffer;
+            set => _buffer = value;
         }
 
-        public ComputeBuffer ObtenerDatosBuffer(int cantidad)
+        private ComputeBuffer _buffer;
+        private int _stride, _cantidadActual;
+        private Func<int, int, ComputeBuffer> _creacionBuffer;
+
+        public BufferManager(int stride, Func<int, int, ComputeBuffer> crearBuffer)
         {
-            if (DatosBuffer == null || _cantidadDatosActual < cantidad)
+            _stride = stride;
+            _creacionBuffer = crearBuffer;
+        }
+
+        public ComputeBuffer ObtenerBuffer(int cantidad)
+        {
+            if (Buffer == null || _cantidadActual < cantidad)
             {
-                DatosBuffer = CrearDatosBuffer(cantidad);
-                _cantidadDatosActual = cantidad;
+                Buffer = CrearBuffer(cantidad);
+                _cantidadActual = cantidad;
             }
-            DatosBuffer.SetCounterValue((uint)(_cantidadDatosActual - cantidad));
-
-            return DatosBuffer;
+            Buffer.SetCounterValue(_startCount);
+            return Buffer;
         }
 
-        private ComputeBuffer CrearDatosBuffer(int cantidad)
+        private ComputeBuffer CrearBuffer(int cantidad)
         {
-            DatosBuffer?.Dispose();
-            return new ComputeBuffer(cantidad, _strideDatos);
+            Destruir();
+            return _creacionBuffer(cantidad, _stride);
         }
 
-        public ComputeBuffer ObtenerTriangulosBuffer(int cantidad)
-        {
-            if (TriangulosBuffer == null || _cantidadTriangulosActual < cantidad)
-            {
-                TriangulosBuffer = CrearTriangulosBuffer(cantidad);
-                _cantidadTriangulosActual = cantidad;
-            }
-            TriangulosBuffer.SetCounterValue(0);
-
-            return TriangulosBuffer;
-        }
-
-        private ComputeBuffer CrearTriangulosBuffer(int cantidad)
-        {
-
-            TriangulosBuffer?.Dispose();
-            return new ComputeBuffer(cantidad, _strideTriangulos, ComputeBufferType.Append);
-        }
-        
         public void Destruir()
         {
-            TriangulosBuffer?.Dispose();
-            DatosBuffer?.Dispose();
+            _buffer?.Dispose();
         }
     }
 }
