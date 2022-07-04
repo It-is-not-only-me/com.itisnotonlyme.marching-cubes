@@ -32,14 +32,26 @@ int cantidadPorEje;
 int cantidadIndices;
 float isoLevel;
 
-float3 interpolateFloat4(float4 v1, float4 v2) {
-    float t = (isoLevel - v1.w) / (v2.w - v1.w);
-    return v1.xyz + t * (v2.xyz - v1.xyz);
+float invLerp(float from, float to, float value) {
+    return (value - from) / (to - from);
 }
 
-float2 interpolateFloat3(float3 v1, float3 v2) {
-    float t = (isoLevel - v1.z) / (v2.z - v1.z);
-    return v1.xy + t * (v2.xy - v1.xy);
+float3 interpolate(float4 v1, float4 v2) {
+    float t = invLerp(v1.w, v2.w, isoLevel);
+    return lerp(v1.xyz, v2.xyz, t);
+}
+
+float2 interpolate(float3 v1, float3 v2) {
+    float t = invLerp(v1.z, v2.z, isoLevel);
+    return lerp(v1.xy, v2.xy, t);
+}
+
+float3 interpolateExtremos(float4 v1, float4 v2) {
+    return lerp(v1.xyz, v2.xyz, v1.w > isoLevel);
+}
+
+float2 interpolateExtremos(float3 v1, float3 v2) {
+    return lerp(v1.xy, v2.xy, v1.z > isoLevel);
 }
 
 float4 pointAtIndex(int i) {
@@ -98,10 +110,10 @@ void March(int3 id : SV_DispatchThreadID) {
             int a = cornerIndexAFromEdge[triangulation[cubeIndex][i + z]];
             int b = cornerIndexBFromEdge[triangulation[cubeIndex][i + z]];
 
-            vertices[z].vertex = interpolateFloat4(cubeCorners[a], cubeCorners[b]);
-            vertices[z].uv = interpolateFloat3(uvCorners[a], uvCorners[b]);
-            vertices[z].uv2 = interpolateFloat3(uv2Corners[a], uv2Corners[b]);
-            vertices[z].color = interpolateFloat4(colorCorners[a], colorCorners[b]);
+            vertices[z].vertex = interpolate(cubeCorners[a], cubeCorners[b]);
+            vertices[z].uv = interpolateExtremos(uvCorners[a], uvCorners[b]);
+            vertices[z].uv2 = interpolateExtremos(uv2Corners[a], uv2Corners[b]);
+            vertices[z].color = interpolateExtremos(colorCorners[a], colorCorners[b]);
         }
 
         Triangle tri;
