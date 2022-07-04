@@ -92,38 +92,22 @@ void March(int3 id : SV_DispatchThreadID) {
 
     for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3) {
 
-        int a0 = cornerIndexAFromEdge[triangulation[cubeIndex][i]];
-        int b0 = cornerIndexBFromEdge[triangulation[cubeIndex][i]];
+        Vertice vertices[3];
 
-        int a1 = cornerIndexAFromEdge[triangulation[cubeIndex][i + 1]];
-        int b1 = cornerIndexBFromEdge[triangulation[cubeIndex][i + 1]];
+        for (int z = 0; z < 3; z++) {
+            int a = cornerIndexAFromEdge[triangulation[cubeIndex][i + z]];
+            int b = cornerIndexBFromEdge[triangulation[cubeIndex][i + z]];
 
-        int a2 = cornerIndexAFromEdge[triangulation[cubeIndex][i + 2]];
-        int b2 = cornerIndexBFromEdge[triangulation[cubeIndex][i + 2]];
+            vertices[z].vertex = interpolateFloat4(cubeCorners[a], cubeCorners[b]);
+            vertices[z].uv = interpolateFloat3(uvCorners[a], uvCorners[b]);
+            vertices[z].uv2 = interpolateFloat3(uv2Corners[a], uv2Corners[b]);
+            vertices[z].color = interpolateFloat4(colorCorners[a], colorCorners[b]);
+        }
 
         Triangle tri;
-
-        Vertice verticeA;
-        verticeA.vertex = interpolateFloat4(cubeCorners[a0], cubeCorners[b0]);
-        verticeA.uv = interpolateFloat3(uvCorners[a0], uvCorners[b0]);
-        verticeA.uv2 = interpolateFloat3(uv2Corners[a0], uv2Corners[b0]);
-        verticeA.color = interpolateFloat4(colorCorners[a0], colorCorners[b0]);
-
-        Vertice verticeB;
-        verticeB.vertex = interpolateFloat4(cubeCorners[a1], cubeCorners[b1]);
-        verticeB.uv = interpolateFloat3(uvCorners[a1], uvCorners[b1]);
-        verticeB.uv2 = interpolateFloat3(uv2Corners[a1], uv2Corners[b1]);
-        verticeB.color = interpolateFloat4(colorCorners[a1], colorCorners[b1]);
-
-        Vertice verticeC;
-        verticeC.vertex = interpolateFloat4(cubeCorners[a2], cubeCorners[b2]);
-        verticeC.uv = interpolateFloat3(uvCorners[a2], uvCorners[b2]);
-        verticeC.uv2 = interpolateFloat3(uv2Corners[a2], uv2Corners[b2]);
-        verticeC.color = interpolateFloat4(colorCorners[a2], colorCorners[b2]);
-
-        tri.verticeA = verticeA;
-        tri.verticeB = verticeB;
-        tri.verticeC = verticeC;
+        tri.verticeA = vertices[0];
+        tri.verticeB = vertices[1];
+        tri.verticeC = vertices[2];
         triangles.Append(tri);
     }
 }

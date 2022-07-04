@@ -125,7 +125,6 @@ Shader "MarchingCubes/Render"
                 float orientacion = saturate(dot(_WorldSpaceLightPos0.xyz, i.normal));
 
                 return float4(color * orientacion, 1);
-                //return float4(i.normal, 1);
             }
 
             ENDCG
