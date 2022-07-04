@@ -16,7 +16,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private GenerarDatos _generador;
 
         private int _cantidadDeFloatDatos = 4;
-        private int _cantidadDeFloatTriangulos = 3 * 3;
+        private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
         private int _triangulosPorDato = 5;
         private int _cantidadDeFloatUvs = 2;
         private int _cantidadDeFloatColores = 4;
@@ -76,16 +76,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void ActualizarDatos()
         {
-            Vector3Int puntosPorEje = _generador.NumeroDePuntosPorEje;
-            int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
             MarchingCubeMesh mesh = _generador.MarchingCubeMesh;
+            int cantidadDeDatos = mesh.Datos.Length;
 
             _bufferDatos.ObtenerBuffer(cantidadDeDatos).SetData(mesh.Datos);
 
             int triangulosCount = cantidadDeDatos * _triangulosPorDato;
             _bufferTriangulos.ObtenerBuffer(triangulosCount);
 
-            int cantidadDeindices = ((puntosPorEje.x - 1) * (puntosPorEje.y - 1) * (puntosPorEje.z - 1)) * 8;
+            int cantidadDeindices = mesh.Indices.Length;
             _bufferIndices.ObtenerBuffer(cantidadDeindices).SetData(mesh.Indices);
 
             int cantidadDeUvs = cantidadDeDatos;
