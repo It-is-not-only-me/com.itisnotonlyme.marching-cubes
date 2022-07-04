@@ -11,18 +11,9 @@ struct Vertice {
 };
 
 struct Triangle {
-    float3 vertexA;
-    float2 uvA;
-    float2 uv2A;
-    float3 colorA;
-    float3 vertexB;
-    float2 uvB;
-    float2 uv2B;
-    float3 colorB;
-    float3 vertexC;
-    float2 uvC;
-    float2 uv2C;
-    float3 colorC;
+    Vertice verticeA;
+    Vertice verticeB;
+    Vertice verticeC;
 };
 
 struct Dato {
@@ -74,28 +65,6 @@ float4 colorAtIndex(int i) {
     return float4(color, valor);
 }
 
-Triangle crearTriangulo(Vertice verticeA, Vertice verticeB, Vertice verticeC) {
-
-    Triangle triangulo;
-
-    triangulo.vertexA = verticeA.vertex;
-    triangulo.uvA = verticeA.uv;
-    triangulo.uv2A = verticeA.uv2;
-    triangulo.colorA = verticeA.color;
-
-    triangulo.vertexB = verticeB.vertex;
-    triangulo.uvB = verticeB.uv;
-    triangulo.uv2B = verticeB.uv2;
-    triangulo.colorB = verticeB.color;
-
-    triangulo.vertexC = verticeC.vertex;
-    triangulo.uvC = verticeC.uv;
-    triangulo.uv2C = verticeC.uv2;
-    triangulo.colorC = verticeC.color;
-
-    return triangulo;
-}
-
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
 
@@ -135,6 +104,10 @@ void March(int3 id : SV_DispatchThreadID) {
             vertices[z].color = interpolateFloat4(colorCorners[a], colorCorners[b]);
         }
 
-        triangles.Append(crearTriangulo(vertices[0], vertices[1], vertices[2]));
+        Triangle tri;
+        tri.verticeA = vertices[0];
+        tri.verticeB = vertices[1];
+        tri.verticeC = vertices[2];
+        triangles.Append(tri);
     }
 }
