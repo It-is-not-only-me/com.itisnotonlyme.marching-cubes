@@ -6,7 +6,7 @@ public class GeneradorDatosPerlin : GenerarDatos
 {
     [SerializeField] private bool _actualizar = true;
 
-    public override Vector3Int NumeroDePuntosPorEje => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
+    private Vector3Int _numeroDePuntosPorEje => new Vector3Int((int)_tamanioX, (int)_tamanioY, (int)_tamanioZ) + Vector3Int.one;
     public override bool Actualizar
     {
         get
@@ -40,7 +40,7 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     private void GenerarMesh()
     {
-        Vector3Int puntosPorEje = NumeroDePuntosPorEje;
+        Vector3Int puntosPorEje = _numeroDePuntosPorEje;
         int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
         Dato[] datos = new Dato[cantidadDeDatos];
         Vector2[] uvs = new Vector2[cantidadDeDatos];
