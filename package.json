@@ -1,6 +1,6 @@
 {
     "name": "com.itisnotonlyme.marching-cubes",
-    "version": "2.2.4",
+    "version": "2.3.0",
     "displayName": "Marching Cubes",
     "description": "Te permite usar el algoritmo de Marching Cubes pero con una mayor eficiencia, ya que esta optimizada para ejecutarse mayormente en el lado de la GPU",
     "unity": "2021.3",
