@@ -1,5 +1,5 @@
 {
-    "name": "Demo",
+    "name": "Demo-marching-cubes",
     "rootNamespace": "",
     "references": [
         "GUID:9fcbbec6b77f1ae488d8d98312106a64",
