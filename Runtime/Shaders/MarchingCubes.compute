@@ -24,9 +24,13 @@ struct Dato {
 AppendStructuredBuffer<Triangle> triangles;
 StructuredBuffer<Dato> datos;
 StructuredBuffer<int> indices;
+
 StructuredBuffer<float2> uvs;
+bool usaUVs;
 StructuredBuffer<float2> uvs2;
+bool usaUV2s;
 StructuredBuffer<float4> colores;
+bool usaColores;
 
 int cantidadPorEje;
 int cantidadIndices;
@@ -111,9 +115,9 @@ void March(int3 id : SV_DispatchThreadID) {
             int b = cornerIndexBFromEdge[triangulation[cubeIndex][i + z]];
 
             vertices[z].vertex = interpolate(cubeCorners[a], cubeCorners[b]);
-            vertices[z].uv = interpolateExtremos(uvCorners[a], uvCorners[b]);
-            vertices[z].uv2 = interpolateExtremos(uv2Corners[a], uv2Corners[b]);
-            vertices[z].color = interpolateExtremos(colorCorners[a], colorCorners[b]);
+            vertices[z].uv = float2(0, 0) + (usaUVs * interpolateExtremos(uvCorners[a], uvCorners[b]));
+            vertices[z].uv2 = float2(0, 0) + (usaUV2s * interpolateExtremos(uv2Corners[a], uv2Corners[b]));
+            vertices[z].color = float3(0, 0, 0) + (usaColores * interpolateExtremos(colorCorners[a], colorCorners[b]));
         }
 
         Triangle tri;
