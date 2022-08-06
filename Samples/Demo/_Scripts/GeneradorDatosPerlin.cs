@@ -60,7 +60,7 @@ public class GeneradorDatosPerlin : GenerarDatos
                     float valor = Perlin3D(posicionPerlin);
 
                     uvs[contador] = new Vector2(i % 2, j % 2);
-                    colores[contador] = new Color(1, 1, 1);
+                    colores[contador] = new Color(0.75f, 0.75f, 1);
                     datos[contador++].CargarDatos(posicion, valor);
                 }
 

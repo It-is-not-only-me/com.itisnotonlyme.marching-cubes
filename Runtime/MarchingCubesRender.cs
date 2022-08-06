@@ -13,6 +13,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private ComputeBuffer _argBuffer;
         private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs, _bufferUvs2, _bufferColores;
+        private bool _usaUVs, _usaUV2s, _usaColores;
         private GenerarDatos _generador;
 
         private int _cantidadDeFloatDatos = 4;
@@ -38,8 +39,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _bufferTriangulos = new BufferManager(triangulosStride, CrearBufferAppend);
             _bufferIndices = new BufferManager(indicesStride, CrearBuffer);
             _bufferUvs = new BufferManager(uvsStride, CrearBuffer);
+            _usaUVs = true;
             _bufferUvs2 = new BufferManager(uvsStride, CrearBuffer);
+            _usaUV2s = true;
             _bufferColores = new BufferManager(coloresStride, CrearBuffer);
+            _usaColores = true;
 
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
@@ -87,14 +91,20 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int cantidadDeindices = mesh.Indices.Length;
             _bufferIndices.ObtenerBuffer(cantidadDeindices).SetData(mesh.Indices);
 
-            int cantidadDeUvs = cantidadDeDatos;
-            _bufferUvs.ObtenerBuffer(cantidadDeUvs).SetData(mesh.Uvs);
+            int cantidadDeUvs = mesh.Uvs.Length;
+            _usaUVs = cantidadDeUvs != 0;
+            if (_usaUVs)
+                _bufferUvs.ObtenerBuffer(cantidadDeUvs).SetData(mesh.Uvs);
 
-            int cantidadDeUvs2 = cantidadDeDatos;
-            _bufferUvs2.ObtenerBuffer(cantidadDeUvs2).SetData(mesh.Uvs2);
+            int cantidadDeUvs2 = mesh.Uvs2.Length;
+            _usaUV2s = cantidadDeUvs2 != 0;
+            if (_usaUV2s)
+                _bufferUvs2.ObtenerBuffer(cantidadDeUvs2).SetData(mesh.Uvs2);
 
-            int cantidadDeColores = cantidadDeDatos;
-            _bufferColores.ObtenerBuffer(cantidadDeColores).SetData(mesh.Colores);
+            int cantidadDeColores = mesh.Colores.Length;
+            _usaColores = cantidadDeColores != 0;
+            if (_usaColores)
+                _bufferColores.ObtenerBuffer(cantidadDeColores).SetData(mesh.Colores);
 
             Dispatch();
         }
@@ -110,8 +120,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader().SetBuffer(kernel, "datos", _bufferDatos.Buffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "indices", _bufferIndices.Buffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "uvs", _bufferUvs.Buffer);
+            _datosRender.ComputeShader().SetBool("usaUVs", _usaUVs);
             _datosRender.ComputeShader().SetBuffer(kernel, "uvs2", _bufferUvs2.Buffer);
+            _datosRender.ComputeShader().SetBool("usaUV2s", _usaUV2s);
             _datosRender.ComputeShader().SetBuffer(kernel, "colores", _bufferColores.Buffer);
+            _datosRender.ComputeShader().SetBool("usaColores", _usaColores);
 
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
