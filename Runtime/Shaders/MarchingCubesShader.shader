@@ -107,10 +107,13 @@ Shader "MarchingCubes/Render"
                 
                 for (int i = 0; i < 6; i++) 
                 {
-                    Plano plano = planos[i];
-                    float3 puntoEnPlano = plano.normal * plano.distancia;
-                    float3 verticeTransladado = -vertice + puntoEnPlano;
-                    adentro = adentro && dot(plano.normal, verticeTransladado) > 0;
+                    float3 normal = planos[i].normal;
+                    float distancia = planos[i].distancia;
+
+                    float3 puntoEnPlano = normal * -distancia;
+                    float3 verticeTransladado = vertice - puntoEnPlano;
+
+                    adentro = adentro && dot(normal, verticeTransladado) > 0;
                 }
 
                 return adentro;

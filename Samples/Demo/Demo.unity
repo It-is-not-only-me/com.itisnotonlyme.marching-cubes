@@ -293,14 +293,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1012507091}
-  m_LocalRotation: {x: 0, y: -0.76323247, z: 0, w: 0.64612406}
-  m_LocalPosition: {x: 65.38, y: 5, z: 36.82}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -99.5, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1317575781
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,9 +346,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 4044685854255544995, guid: 281cd95fcf2345344860a30c802c04d2, type: 3}
-  _radio: 1
-  _dimensionDeChunk: {x: 30, y: 30, z: 30}
-  _puntosPorEje: {x: 90, y: 90, z: 90}
+  _radio: 5
+  _dimensionDeChunk: {x: 10, y: 30, z: 10}
+  _puntosPorEje: {x: 30, y: 90, z: 30}
   _cantidadDeChunkPorFrame: 20
   _datosRender: {fileID: 11400000, guid: 1fbb6e4322bf90b4daed772421a66a8f, type: 2}
   _meshLocal: 0
