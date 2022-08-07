@@ -23,20 +23,30 @@ Shader "MarchingCubes/Render"
 
             #include "UnityCG.cginc"
 
-            struct Vertice {
+            struct Vertice 
+            {
                 float3 vertex;
                 float2 uv;
                 float2 uv2;
                 float3 color;
             };
 
-            struct Triangle {
+            struct Triangle 
+            {
                 Vertice verticeA;
                 Vertice verticeB;
                 Vertice verticeC;
             };
 
+            struct Plano 
+            {
+                float3 normal;
+                float distancia;
+            };
+
             StructuredBuffer<Triangle> triangulos;
+            StructuredBuffer<Plano> planos;
+
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
@@ -69,7 +79,6 @@ Shader "MarchingCubes/Render"
             v2g vert (uint id : SV_VertexID)
             {
                 Triangle triangulo = triangulos[id];
-
                 v2g o;
 
                 o.vertexA = float4(triangulo.verticeA.vertex, 1);
@@ -92,10 +101,32 @@ Shader "MarchingCubes/Render"
                 return o;
             }
 
+            bool DentroDeCamaraFrustum(float3 vertice)
+            {
+                bool adentro = true;
+                
+                for (int i = 0; i < 6; i++) 
+                {
+                    Plano plano = planos[i];
+                    float3 puntoEnPlano = plano.normal * plano.distancia;
+                    float3 verticeTransladado = -vertice + puntoEnPlano;
+                    adentro = adentro && dot(plano.normal, verticeTransladado) > 0;
+                }
+
+                return adentro;
+            }
+
             [maxvertexcount(3)]
             void geom(point v2g patch[1], inout TriangleStream<g2f> triStream)
             {
                 v2g triangulo = patch[0];
+
+                bool dentroVerticeA = DentroDeCamaraFrustum(triangulo.vertexA);
+                bool dentroVerticeB = DentroDeCamaraFrustum(triangulo.vertexB);
+                bool dentroVerticeC = DentroDeCamaraFrustum(triangulo.vertexC);
+
+                if (!dentroVerticeA && !dentroVerticeB && !dentroVerticeC)
+                    return;
 
                 float3 normal = triangulo.normal;
 

@@ -6,6 +6,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
     {
         public Shader GeometryShader();
         public ComputeShader ComputeShader();
+        public Camera Camara();
         public float IsoLevel();
     }
 }

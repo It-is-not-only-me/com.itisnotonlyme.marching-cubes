@@ -11,10 +11,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private Material _material;
         [SerializeField] private DatosRender _datosRender;
 
-        private ComputeBuffer _argBuffer;
+        private ComputeBuffer _argBuffer, _planosBuffer;
         private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs, _bufferUvs2, _bufferColores;
         private bool _usaUVs, _usaUV2s, _usaColores;
         private GenerarDatos _generador;
+        private Camera _camara;
 
         private int _cantidadDeFloatDatos = 4;
         private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
@@ -27,7 +28,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             Material nuevoMaterial = new Material(_datosRender.GeometryShader());
             nuevoMaterial?.CopyPropertiesFromMaterial(_material);
             _material = nuevoMaterial;
-            CrearArgBuffer();
+            CrearBufferAuxileares();
+
+            _camara = _datosRender.Camara();
+            if (_camara == null)
+                _camara = Camera.main;
 
             int datosStride = _cantidadDeFloatDatos * sizeof(float);
             int triangulosStride = _cantidadDeFloatTriangulos * sizeof(float);
@@ -55,6 +60,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void OnDestroy()
         {
             _argBuffer?.Dispose();
+            _planosBuffer?.Dispose();
 
             _bufferDatos.Destruir();
             _bufferTriangulos.Destruir();
@@ -71,11 +77,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
             Render();
         }
 
-        public void CrearArgBuffer()
+        public void CrearBufferAuxileares()
         {
             int argCount = 4;
             int argStride = sizeof(int);
             _argBuffer = new ComputeBuffer(argCount, argStride, ComputeBufferType.IndirectArguments);
+
+            int planosCount = 6;
+            int planosStride = 3 * sizeof(float) + sizeof(float);
+            _planosBuffer = new ComputeBuffer(planosCount, planosStride);
         }
 
         private void ActualizarDatos()
@@ -140,8 +150,12 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _argBuffer.SetData(args);
             ComputeBuffer.CopyCount(triangulosBuffer, _argBuffer, 0);
 
+            Plane[] planos = GeometryUtility.CalculateFrustumPlanes(_camara);
+            _planosBuffer.SetData(planos);
+
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
+            _material.SetBuffer("planos", _planosBuffer);
 
             Graphics.DrawProceduralIndirect(_material, _generador.MarchingCubeMesh.Limites, MeshTopology.Points, _argBuffer);
         }
