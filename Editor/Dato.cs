@@ -25,18 +25,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         public int CompareTo(object obj)
         {
             Dato dato = (Dato)obj;
-            int esIgual = 0;
-
-            esIgual += CompararFloat(Valor, dato.Valor);
-            for (int i = 0; i < 3; i++)
-                esIgual += CompararFloat(Posicion[i], dato.Posicion[i]);
-
-            return esIgual;
-        }
-
-        private static int CompararFloat(float valor1, float valor2)
-        {
-            return (int) (_aplificacion * (valor1 - valor2));
+            return (int)(_aplificacion * (Valor - dato.Valor));
         }
     }
 }
