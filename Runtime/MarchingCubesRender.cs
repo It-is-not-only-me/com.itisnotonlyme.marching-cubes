@@ -23,6 +23,22 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private int _cantidadDeFloatUvs = 2;
         private int _cantidadDeFloatColores = 4;
 
+        private bool _necesitaActualizarse = false;
+        private bool _actualizar
+        {
+            get
+            {
+                _necesitaActualizarse |= _generador.Actualizar;
+                return _necesitaActualizarse;
+            }
+
+            set
+            {
+                if (!value)
+                    _necesitaActualizarse = value;
+            }
+        }
+
         private void Awake()
         {
             Material nuevoMaterial = new Material(_datosRender.GeometryShader());
@@ -72,9 +88,22 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         private void Update()
         {
-            if (_generador.Actualizar)
+            if (!PuedeVerse())
+                return;
+
+            if (_actualizar)
+            {
                 ActualizarDatos();
+                _actualizar = false;
+            }
             Render();
+        }
+
+        public bool PuedeVerse()
+        {
+            MinimoLimite limiteMinimo = _generador.MarchingCubeMesh.MinimoLimite;
+
+            return false;
         }
 
         public void CrearBufferAuxileares()

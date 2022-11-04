@@ -10,26 +10,30 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private Vector2[] _uv;
         private Vector2[] _uv2;
         private Color[] _colores;
+        private MinimoLimite _limiteMinimo;
 
         public MarchingCubeMesh(Bounds limites,
                                 Dato[] datos = null,
                                 int[] indices = null,
                                 Vector2[] uv = null,
                                 Vector2[] uv2 = null,
-                                Color[] colores = null)
+                                Color[] colores = null,
+                                MinimoLimite limiteMinimo = null)
         {
             _limites = limites;
             _datos = datos;
+            _limiteMinimo = (limiteMinimo == null) ? new MinimoLimite() : limiteMinimo;
+            foreach (Dato dato in _datos)
+                _limiteMinimo.AgregarPunto(dato.Posicion);
+
             _indices = indices;
             _uv = uv;
             _uv2 = uv2;
             _colores = colores;
         }
 
-        public Bounds Limites
-        {
-            get => _limites;
-        }
+        public Bounds Limites { get => _limites; }
+        public MinimoLimite MinimoLimite { get => _limiteMinimo; }
 
         public Dato[] Datos
         {
@@ -99,6 +103,5 @@ namespace ItIsNotOnlyMe.MarchingCubes
                 _colores = value;
             }
         }
-
     }
 }
