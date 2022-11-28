@@ -12,7 +12,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer, _planosBuffer;
-        private Texture2D _datosTexture, _uvsTexture;
+        [SerializeField] private Texture2D _datosTexture, _uvsTexture;
 
         private BufferManager _bufferTriangulos, _bufferIndices;
         private GenerarDatos _generador;

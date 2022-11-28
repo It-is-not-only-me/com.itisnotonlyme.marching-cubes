@@ -40,7 +40,7 @@ float4 interpolateExtremos(float4 v1, float valorInterpolacion, float4 v2) {
 }
 
 int2 posicionEnTextura(uint indice) {
-    return int2(indice / anchoTextura, indice % anchoTextura);
+    return int2((int)(indice / anchoTextura), (int)(indice % anchoTextura));
 }
 
 [numthreads(numThreads, numThreads, numThreads)]

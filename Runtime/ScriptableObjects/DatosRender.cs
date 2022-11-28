@@ -2,7 +2,7 @@
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
-    [CreateAssetMenu(fileName = "Datos para render", menuName = "MarchingCubes/Datos para render")]
+    [CreateAssetMenu(fileName = "_datos para render", menuName = "MarchingCubes/_datos para render")]
     public class DatosRender : ScriptableObject, IDatoRender
     {
         [SerializeField] private Shader _geometryShader;
