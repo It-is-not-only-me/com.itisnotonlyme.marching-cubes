@@ -25,63 +25,56 @@ public class GeneradorDatosPerlin : GenerarDatos
     private MarchingCubeMesh _marchingCubeMesh;
     private Bounds _limites;
 
-    public void Inicializar(Vector3 posicion, Vector3 ancho, Vector3Int puntoPorEje)
+    public void Inicializar(Vector3 posicion, Vector3 ancho, Vector3Int puntosPorEje)
     {
         transform.position = Vector3.zero;
-        _tamanioX = (uint)puntoPorEje.x;
-        _tamanioY = (uint)puntoPorEje.y;
-        _tamanioZ = (uint)puntoPorEje.z;
+        _tamanioX = (uint)puntosPorEje.x;
+        _tamanioY = (uint)puntosPorEje.y;
+        _tamanioZ = (uint)puntosPorEje.z;
         _actualizar = true;
 
         _limites = new Bounds(posicion, ancho * 2);
-        _marchingCubeMesh = new MarchingCubeMesh(_limites);
+
+        int cantidadDeDatos = _numeroDePuntosPorEje.x * _numeroDePuntosPorEje.y * _numeroDePuntosPorEje.z;
+        int cantidadDeindices = ((_numeroDePuntosPorEje.x - 1) * (_numeroDePuntosPorEje.y - 1) * (_numeroDePuntosPorEje.z - 1)) * 8;
+
+        _marchingCubeMesh = new MarchingCubeMesh(_limites, cantidadDeDatos, cantidadDeindices);
         GenerarMesh();
     }
 
     private void GenerarMesh()
     {
         Vector3Int puntosPorEje = _numeroDePuntosPorEje;
-        int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
-        Dato[] datos = new Dato[cantidadDeDatos];
-        Vector4[] uvs = new Vector4[cantidadDeDatos];
 
-        int contador = 0;
-        for (int i = 0; i < puntosPorEje.x; i++)
-            for (int j = 0; j < puntosPorEje.y; j++)
-                for (int k = 0; k < puntosPorEje.z; k++)
+        for (int i = 0, contador = 0; i < _numeroDePuntosPorEje.x; i++)
+            for (int j = 0; j < _numeroDePuntosPorEje.y; j++)
+                for (int k = 0; k < _numeroDePuntosPorEje.z; k++, contador++)
                 {
-                    float x = Mathf.Lerp(0, _limites.size.x, ((float)i) / (puntosPorEje.x - 1));
-                    float y = Mathf.Lerp(0, _limites.size.y, ((float)j) / (puntosPorEje.y - 1));
-                    float z = Mathf.Lerp(0, _limites.size.z, ((float)k) / (puntosPorEje.z - 1));
+                    float x = Mathf.Lerp(0, _limites.size.x, ((float)i) / (_numeroDePuntosPorEje.x - 1));
+                    float y = Mathf.Lerp(0, _limites.size.y, ((float)j) / (_numeroDePuntosPorEje.y - 1));
+                    float z = Mathf.Lerp(0, _limites.size.z, ((float)k) / (_numeroDePuntosPorEje.z - 1));
 
                     Vector3 posicion = new Vector3(x, y, z) + _limites.center - (_limites.size / 2);
                     Vector3 posicionPerlin = posicion * _noiseScale + Vector3.one * 200;
                     float valor = Perlin3D(posicionPerlin);
 
-                    uvs[contador] = new Vector4(i % 2, j % 2, 0, 0);
-                    datos[contador++].CargarDatos(posicion, valor);
+                    _marchingCubeMesh.AgregarUV(new Color(i % 2, j % 2, 0, 0), contador);
+                    _marchingCubeMesh.AgregarDato(new Color(posicion.x, posicion.y, posicion.z, valor), contador);
                 }
 
-        _marchingCubeMesh.Datos = datos;
-        _marchingCubeMesh.Uvs = uvs;
-
-        int cantidadDeindices = ((puntosPorEje.x - 1) * (puntosPorEje.y - 1) * (puntosPorEje.z - 1)) * 8;
-        int[] indices = new int[cantidadDeindices];
-        for (int i = 0, posicion = 0; i < puntosPorEje.x - 1; i++)
-            for (int j = 0; j < puntosPorEje.y - 1; j++)
-                for (int k = 0; k < puntosPorEje.z - 1; k++, posicion += 8)
+        for (int i = 0, posicion = 0; i < _numeroDePuntosPorEje.x - 1; i++)
+            for (int j = 0; j < _numeroDePuntosPorEje.y - 1; j++)
+                for (int k = 0; k < _numeroDePuntosPorEje.z - 1; k++, posicion += 8)
                 {
-                    indices[posicion] = IndicePorEje(i, j, k, puntosPorEje);
-                    indices[posicion + 1] = IndicePorEje(i + 1, j, k, puntosPorEje);
-                    indices[posicion + 2] = IndicePorEje(i + 1, j, k + 1, puntosPorEje);
-                    indices[posicion + 3] = IndicePorEje(i, j, k + 1, puntosPorEje);
-                    indices[posicion + 4] = IndicePorEje(i, j + 1, k, puntosPorEje);
-                    indices[posicion + 5] = IndicePorEje(i + 1, j + 1, k, puntosPorEje);
-                    indices[posicion + 6] = IndicePorEje(i + 1, j + 1, k + 1, puntosPorEje);
-                    indices[posicion + 7] = IndicePorEje(i, j + 1, k + 1, puntosPorEje);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i, j, k, _numeroDePuntosPorEje), posicion);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i + 1, j, k, _numeroDePuntosPorEje), posicion + 1);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i + 1, j, k + 1, _numeroDePuntosPorEje), posicion + 2);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i, j, k + 1, _numeroDePuntosPorEje), posicion + 3);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i, j + 1, k, _numeroDePuntosPorEje), posicion + 4);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i + 1, j + 1, k, _numeroDePuntosPorEje), posicion + 5);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i + 1, j + 1, k + 1, _numeroDePuntosPorEje), posicion + 6);
+                    _marchingCubeMesh.AgregarIndice(IndicePorEje(i, j + 1, k + 1, _numeroDePuntosPorEje), posicion + 7);
                 }
-
-        _marchingCubeMesh.Indices = indices;
     }
 
     private int IndicePorEje(int x, int y, int z, Vector3Int puntosPorEje)

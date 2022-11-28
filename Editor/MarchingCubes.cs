@@ -6,10 +6,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
 {
 	public static class MarchingCubes
 	{
-		static private int _cantidadDeFloatDatos = 4;
 		static private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
 		static private int _triangulosPorDato = 5;
-		static private int _cantidadDeFloatUvs = 4;
 
 		struct Vertice
         {
@@ -48,36 +46,33 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			public Vector3 GetNormales() => (Vector3.Cross(GetVertice(1) - GetVertice(0), GetVertice(2) - GetVertice(0))).normalized;
 		}
 
-		static private ComputeBuffer _datosBuffer, _indicesBuffer, _triangulosBuffer, _uvsBuffers;
+		static private ComputeBuffer _indicesBuffer, _triangulosBuffer;
+		static private Texture2D _datosTexture, _uvsTexture;
+		static private int _tamanioTextura;
 
 		public static Mesh CrearMesh(IObtenerDatos obtenerDatos, IDatoRender datosRender)
 		{
 			MarchingCubeMesh mesh = obtenerDatos.MarchingCubeMesh;
-			int cantidadDeDatos = mesh.Datos.Length;
 			
-			_datosBuffer = new ComputeBuffer(cantidadDeDatos, _cantidadDeFloatDatos * sizeof(float));
-			_datosBuffer.SetData(mesh.Datos);
+			_datosTexture = mesh.Datos;
 
-			int cantidadDeTriangulos = cantidadDeDatos * _triangulosPorDato;
+			int cantidadDeTriangulos = mesh.CantidadElementos * _triangulosPorDato;
 			_triangulosBuffer = new ComputeBuffer(cantidadDeTriangulos, _cantidadDeFloatTriangulos * sizeof(float), ComputeBufferType.Append);
 
 			int cantidadDeIndices = mesh.Indices.Length;
 			_indicesBuffer = new ComputeBuffer(cantidadDeIndices, sizeof(int));
 			_indicesBuffer.SetData(mesh.Indices);
 
-			int cantidadDeUvs = cantidadDeDatos;
-			_uvsBuffers = new ComputeBuffer(cantidadDeUvs, _cantidadDeFloatUvs * sizeof(float));
-			_uvsBuffers.SetData(mesh.Uvs);
+			_uvsTexture = mesh.Uvs;
+			_tamanioTextura = mesh.Dimensiones;
 
 			Dispatch(datosRender);
 
 			Triangle[] triangulos = RecuperarTriangulos(_triangulosBuffer);
 			Mesh meshResultado = GenerarMesh(triangulos);
 
-			_datosBuffer.Dispose();
 			_triangulosBuffer.Dispose();
 			_indicesBuffer.Dispose();
-			_uvsBuffers.Dispose();
 
 			return meshResultado;
 		}
@@ -106,11 +101,12 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices / 8, 1.0f / 3.0f));
 
 			datosRender.ComputeShader().SetBuffer(kernel, "triangles", _triangulosBuffer);
-			datosRender.ComputeShader().SetBuffer(kernel, "datos", _datosBuffer);
+			datosRender.ComputeShader().SetTexture(kernel, "datos", _datosTexture);
 			datosRender.ComputeShader().SetBuffer(kernel, "indices", _indicesBuffer);
-			datosRender.ComputeShader().SetBuffer(kernel, "uvs", _uvsBuffers);
+			datosRender.ComputeShader().SetTexture(kernel, "uvs", _uvsTexture);
 
-			datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
+            datosRender.ComputeShader().SetInt("anchoTextura", _tamanioTextura);
+            datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
 			datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
 			datosRender.ComputeShader().SetFloats("isoLevel", datosRender.IsoLevel());
 

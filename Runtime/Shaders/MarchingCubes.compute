@@ -14,17 +14,13 @@ struct Triangle {
     Vertice verticeC;
 };
 
-struct Dato {
-    float3 posicion;
-    float valor;
-};
-
 AppendStructuredBuffer<Triangle> triangles;
-StructuredBuffer<Dato> datos;
-StructuredBuffer<int> indices;
 
-StructuredBuffer<float4> uvs;
-bool usaUVs;
+Texture2D<float4> datos;
+Texture2D<float4> uvs;
+uint anchoTextura;
+
+StructuredBuffer<int> indices;
 
 int cantidadPorEje;
 int cantidadIndices;
@@ -43,6 +39,9 @@ float4 interpolateExtremos(float4 v1, float valorInterpolacion, float4 v2) {
     return lerp(v1, v2, valorInterpolacion > isoLevel);
 }
 
+int2 posicionEnTextura(uint indice) {
+    return int2(indice / anchoTextura, indice % anchoTextura);
+}
 
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
@@ -56,12 +55,11 @@ void March(int3 id : SV_DispatchThreadID) {
     float valorCorners[8];
 
     for (int w = 0; w < 8; w++) {
-        int indiceActual = indices[indice + w];
-        Dato datoActual = datos[indiceActual];
+        int2 posicion = posicionEnTextura((uint)indices[indice + w]);
 
-        cubeCorners[w] = datoActual.posicion;
-        uvCorners[w] = uvs[indiceActual];
-        valorCorners[w] = datoActual.valor;
+        cubeCorners[w] = datos[posicion].xyz;
+        uvCorners[w] = uvs[posicion];
+        valorCorners[w] = datos[posicion].w;
     }
 
     int cubeIndex = 0;
@@ -78,7 +76,7 @@ void March(int3 id : SV_DispatchThreadID) {
             int b = cornerIndexBFromEdge[triangulation[cubeIndex][i + z]];
 
             vertices[z].vertex = interpolate(cubeCorners[a], valorCorners[a], cubeCorners[b], valorCorners[b]);
-            vertices[z].uvs = float4(0, 0, 0, 0) + (usaUVs * interpolateExtremos(uvCorners[a], valorCorners[a], uvCorners[b]));
+            vertices[z].uvs = interpolateExtremos(uvCorners[a], valorCorners[a], uvCorners[b]);
         }
 
         Triangle tri;

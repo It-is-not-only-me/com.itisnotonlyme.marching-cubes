@@ -2,68 +2,45 @@
 
 namespace ItIsNotOnlyMe.MarchingCubes
 {
-    public struct MarchingCubeMesh
+    public class MarchingCubeMesh
     {
-        private Bounds _limites;
-        private Dato[] _datos;
-        private int[] _indices;
-        private Vector4[] _uvs;
+        public Bounds Limites { get; private set; }
+        public Texture2D Datos { get; private set; }
+        public Texture2D Uvs  { get; private set; }
+        public int[] Indices { get; private set; }
+        public int CantidadElementos { get; private set; }
+        public int Dimensiones { get; private set; }
 
-        public MarchingCubeMesh(Bounds limites,
-                                Dato[] datos = null,
-                                int[] indices = null,
-                                Vector4[] uvs = null)
+        private Vector2Int _posicion;
+
+        public MarchingCubeMesh(Bounds limites, int cantidadElementos, int cantidadIndices)
         {
-            _limites = limites;
-            _datos = datos;
-            _indices = indices;
-            _uvs = uvs;
+            Limites = limites;
+            Indices = new int[cantidadIndices];
+            CantidadElementos = cantidadElementos;
+            Dimensiones = Mathf.CeilToInt(Mathf.Sqrt(cantidadElementos));
+            Datos = new Texture2D(Dimensiones, Dimensiones);
+            Uvs = new Texture2D(Dimensiones, Dimensiones);
         }
 
-        public Bounds Limites
+        public void AgregarDato(Dato dato, int posicion) => AgregarDato(new Color(dato.Posicion.x, dato.Posicion.y, dato.Posicion.z, dato.Valor), posicion);
+
+        public void AgregarDato(Color dato, int posicion)
         {
-            get => _limites;
+            PosicionEnTextura(posicion);
+            Datos.SetPixel(_posicion.x, _posicion.y, dato);
         }
 
-        public Dato[] Datos
+        public void AgregarUV(Vector4 uvs, int posicion) => AgregarUV(new Color(uvs.x, uvs.y, uvs.z, uvs.w), posicion);
+
+        public void AgregarUV(Color uvs, int posicion)
         {
-            get
-            {
-                if (_datos == null)
-                    _datos = new Dato[Indices.Length];
-                return _datos;
-            }
-            set
-            {
-                _datos = value;
-            }
+            PosicionEnTextura(posicion);
+            Uvs.SetPixel(_posicion.x, _posicion.y, uvs);
         }
 
-        public int[] Indices
-        {
-            get
-            {
-                return _indices;
-            }
-            set
-            {
-                _indices = value;
-            }
+        public void AgregarIndice(int indice, int posicion) => Indices[posicion] = indice;
 
-        }
-
-        public Vector4[] Uvs
-        {
-            get
-            {
-                if (_uvs == null)
-                    _uvs = new Vector4[Datos.Length];
-                return _uvs;
-            }
-            set
-            {
-                _uvs = value;
-            }
-        }
+        private void PosicionEnTextura(int posicion) => _posicion.Set(Mathf.FloorToInt(posicion / Dimensiones), posicion % Dimensiones);
     }
 }

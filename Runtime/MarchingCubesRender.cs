@@ -12,15 +12,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer, _planosBuffer;
-        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs;
-        private bool _usaUVs;
+        private Texture2D _datosTexture, _uvsTexture;
+
+        private BufferManager _bufferTriangulos, _bufferIndices;
         private GenerarDatos _generador;
         private Camera _camara;
 
-        private int _cantidadDeFloatDatos = 4;
         private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
         private int _triangulosPorDato = 5;
-        private int _cantidadDeFloatUvs = 4;
+        private int _tamanioTextura;
 
         private void Awake()
         {
@@ -33,16 +33,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             if (_camara == null)
                 _camara = Camera.main;
 
-            int datosStride = _cantidadDeFloatDatos * sizeof(float);
             int triangulosStride = _cantidadDeFloatTriangulos * sizeof(float);
-            int indicesStride = sizeof(int);
-            int uvsStride = _cantidadDeFloatUvs * sizeof(float);
-
-            _bufferDatos = new BufferManager(datosStride, CrearBuffer);
             _bufferTriangulos = new BufferManager(triangulosStride, CrearBufferAppend);
+
+            int indicesStride = sizeof(int);
             _bufferIndices = new BufferManager(indicesStride, CrearBuffer);
-            _bufferUvs = new BufferManager(uvsStride, CrearBuffer);
-            _usaUVs = true;
 
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
@@ -55,11 +50,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
         {
             _argBuffer?.Dispose();
             _planosBuffer?.Dispose();
-
-            _bufferDatos.Destruir();
+            
             _bufferTriangulos.Destruir();
             _bufferIndices.Destruir();
-            _bufferUvs.Destruir();
         }
 
         private void FixedUpdate()
@@ -90,20 +83,16 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void ActualizarDatos()
         {
             MarchingCubeMesh mesh = _generador.MarchingCubeMesh;
-            int cantidadDeDatos = mesh.Datos.Length;
 
-            _bufferDatos.ObtenerBuffer(cantidadDeDatos).SetData(mesh.Datos);
-
-            int triangulosCount = cantidadDeDatos * _triangulosPorDato;
+            _datosTexture = mesh.Datos;
+            int triangulosCount = mesh.CantidadElementos * _triangulosPorDato;
             _bufferTriangulos.ObtenerBuffer(triangulosCount);
 
             int cantidadDeindices = mesh.Indices.Length;
             _bufferIndices.ObtenerBuffer(cantidadDeindices).SetData(mesh.Indices);
 
-            int cantidadDeUvs = mesh.Uvs.Length;
-            _usaUVs = cantidadDeUvs != 0;
-            if (_usaUVs)
-                _bufferUvs.ObtenerBuffer(cantidadDeUvs).SetData(mesh.Uvs);
+            _uvsTexture = mesh.Uvs;
+            _tamanioTextura = mesh.Dimensiones;
 
             Dispatch();
         }
@@ -116,11 +105,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int cantidadPorEjes = Mathf.CeilToInt(Mathf.Pow(cantidadIndices / 8, 1.0f / 3.0f));
 
             _datosRender.ComputeShader().SetBuffer(kernel, "triangles", _bufferTriangulos.Buffer);
-            _datosRender.ComputeShader().SetBuffer(kernel, "datos", _bufferDatos.Buffer);
+            _datosRender.ComputeShader().SetTexture(kernel, "datos", _datosTexture);
             _datosRender.ComputeShader().SetBuffer(kernel, "indices", _bufferIndices.Buffer);
-            _datosRender.ComputeShader().SetBuffer(kernel, "uvs", _bufferUvs.Buffer);
-            _datosRender.ComputeShader().SetBool("usaUVs", _usaUVs);
+            _datosRender.ComputeShader().SetTexture(kernel, "uvs", _uvsTexture);
 
+            _datosRender.ComputeShader().SetInt("anchoTextura", _tamanioTextura);
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
             _datosRender.ComputeShader().SetFloats("isoLevel", _datosRender.IsoLevel());
