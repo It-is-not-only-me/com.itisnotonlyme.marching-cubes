@@ -73,7 +73,11 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private void Update()
         {
             if (_generador.Actualizar)
+            {
                 ActualizarDatos();
+                PasarInformacion();
+            }
+            
             Render();
         }
 
@@ -143,7 +147,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader().Dispatch(kernel, cantidadPorEjes, cantidadPorEjes, cantidadPorEjes);
         }
 
-        private void Render()
+        private void PasarInformacion()
         {
             ComputeBuffer triangulosBuffer = _bufferTriangulos.Buffer;
             int[] args = new int[] { 0, 1, 0, 0 };
@@ -156,7 +160,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _material.SetPass(0);
             _material.SetBuffer("triangulos", triangulosBuffer);
             _material.SetBuffer("planos", _planosBuffer);
+        }
 
+        private void Render()
+        {
             Graphics.DrawProceduralIndirect(_material, _generador.MarchingCubeMesh.Limites, MeshTopology.Points, _argBuffer);
         }
     }
