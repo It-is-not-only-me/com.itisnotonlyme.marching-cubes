@@ -9,7 +9,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 		static private int _cantidadDeFloatDatos = 4;
 		static private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
 		static private int _triangulosPorDato = 5;
-		static private int _cantidadDeFloatUvs = 2;
+		static private int _cantidadDeFloatUvs = 4;
 
 		struct Vertice
         {
@@ -35,7 +35,7 @@ namespace ItIsNotOnlyMe.MarchingCubes
 				}
 			}
 
-			public Vector2 GetUv(int i)
+			public Vector4 GetUv(int i)
 			{
 				switch (i)
 				{
@@ -45,20 +45,10 @@ namespace ItIsNotOnlyMe.MarchingCubes
 				}
 			}
 
-			public Vector2 GetUv2(int i)
-			{
-				switch (i)
-				{
-					case 0: return verticeA.uv2;
-					case 1: return verticeB.uv2;
-					default: return verticeC.uv2;
-				}
-			}
-
 			public Vector3 GetNormales() => (Vector3.Cross(GetVertice(1) - GetVertice(0), GetVertice(2) - GetVertice(0))).normalized;
 		}
 
-		static private ComputeBuffer _datosBuffer, _indicesBuffer, _triangulosBuffer, _uvsBuffers, _uvs2Buffer;
+		static private ComputeBuffer _datosBuffer, _indicesBuffer, _triangulosBuffer, _uvsBuffers;
 
 		public static Mesh CrearMesh(IObtenerDatos obtenerDatos, IDatoRender datosRender)
 		{
@@ -79,9 +69,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			_uvsBuffers = new ComputeBuffer(cantidadDeUvs, _cantidadDeFloatUvs * sizeof(float));
 			_uvsBuffers.SetData(mesh.Uvs);
 
-			_uvs2Buffer = new ComputeBuffer(cantidadDeUvs, _cantidadDeFloatUvs * sizeof(float));
-			_uvs2Buffer.SetData(mesh.Uvs2);
-
 			Dispatch(datosRender);
 
 			Triangle[] triangulos = RecuperarTriangulos(_triangulosBuffer);
@@ -91,7 +78,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			_triangulosBuffer.Dispose();
 			_indicesBuffer.Dispose();
 			_uvsBuffers.Dispose();
-			_uvs2Buffer.Dispose();
 
 			return meshResultado;
 		}
@@ -123,7 +109,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			datosRender.ComputeShader().SetBuffer(kernel, "datos", _datosBuffer);
 			datosRender.ComputeShader().SetBuffer(kernel, "indices", _indicesBuffer);
 			datosRender.ComputeShader().SetBuffer(kernel, "uvs", _uvsBuffers);
-			datosRender.ComputeShader().SetBuffer(kernel, "uvs2", _uvs2Buffer);
 
 			datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
 			datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
@@ -142,7 +127,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
 			List<int> indiceTriangulos = new List<int>();
 			List<Vector2> uvs = new List<Vector2>();
 			List<Vector2> uvs2 = new List<Vector2>();
-			List<Color> colores = new List<Color>();
 			List<Vector3> normales = new List<Vector3>();
 
 			for (int i = 0; i < triangulos.Length; i++)
@@ -150,8 +134,9 @@ namespace ItIsNotOnlyMe.MarchingCubes
 				{
 					indiceTriangulos.Add(vertices.Count);
 					vertices.Add(triangulos[i].GetVertice(j));
-					uvs.Add(triangulos[i].GetUv(j));
-					uvs2.Add(triangulos[i].GetUv2(j));
+					Vector4 uvsActual = triangulos[i].GetUv(j);
+                    uvs.Add(new Vector2(uvsActual.x, uvsActual.y));
+					uvs2.Add(new Vector2(uvsActual.z, uvsActual.w));
 					normales.Add(-triangulos[i].GetNormales());
 				}
 

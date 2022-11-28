@@ -5,8 +5,7 @@ static const int numThreads = 1;
 
 struct Vertice {
     float3 vertex;
-    float2 uv;
-    float2 uv2;
+    float4 uvs;
 };
 
 struct Triangle {
@@ -24,10 +23,8 @@ AppendStructuredBuffer<Triangle> triangles;
 StructuredBuffer<Dato> datos;
 StructuredBuffer<int> indices;
 
-StructuredBuffer<float2> uvs;
+StructuredBuffer<float4> uvs;
 bool usaUVs;
-StructuredBuffer<float2> uvs2;
-bool usaUV2s;
 
 int cantidadPorEje;
 int cantidadIndices;
@@ -37,40 +34,15 @@ float invLerp(float from, float to, float value) {
     return (value - from) / (to - from);
 }
 
-float3 interpolate(float4 v1, float4 v2) {
-    float t = invLerp(v1.w, v2.w, isoLevel);
-    return lerp(v1.xyz, v2.xyz, t);
+float3 interpolate(float3 v1, float valorInterpolacion1, float3 v2, float valorInterpolacion2) {
+    float t = invLerp(valorInterpolacion1, valorInterpolacion2, isoLevel);
+    return lerp(v1, v2, t);
 }
 
-float2 interpolate(float3 v1, float3 v2) {
-    float t = invLerp(v1.z, v2.z, isoLevel);
-    return lerp(v1.xy, v2.xy, t);
+float4 interpolateExtremos(float4 v1, float valorInterpolacion, float4 v2) {
+    return lerp(v1, v2, valorInterpolacion > isoLevel);
 }
 
-float3 interpolateExtremos(float4 v1, float4 v2) {
-    return lerp(v1.xyz, v2.xyz, v1.w > isoLevel);
-}
-
-float2 interpolateExtremos(float3 v1, float3 v2) {
-    return lerp(v1.xy, v2.xy, v1.z > isoLevel);
-}
-
-float4 pointAtIndex(int i) {
-    Dato dato = datos[i];
-    return float4(dato.posicion, dato.valor);
-}
-
-float3 uvAtIndex(int i) {
-    float valor = datos[i].valor;
-    float2 uv = uvs[i];
-    return float3(uv, valor);
-}
-
-float3 uv2AtIndex(int i) {
-    float valor = datos[i].valor;
-    float2 uv2 = uvs2[i];
-    return float3(uv2, valor);
-}
 
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
@@ -79,20 +51,22 @@ void March(int3 id : SV_DispatchThreadID) {
 
     if (indice >= cantidadIndices) return;
 
-    float4 cubeCorners[8];
-    float3 uvCorners[8];
-    float3 uv2Corners[8];
+    float3 cubeCorners[8];
+    float4 uvCorners[8];
+    float valorCorners[8];
 
     for (int w = 0; w < 8; w++) {
         int indiceActual = indices[indice + w];
-        cubeCorners[w] = pointAtIndex(indiceActual);
-        uvCorners[w] = uvAtIndex(indiceActual);
-        uv2Corners[w] = uv2AtIndex(indiceActual);
+        Dato datoActual = datos[indiceActual];
+
+        cubeCorners[w] = datoActual.posicion;
+        uvCorners[w] = uvs[indiceActual];
+        valorCorners[w] = datoActual.valor;
     }
 
     int cubeIndex = 0;
     for (int j = 0, nivel = 1; j < 8; j++, nivel *= 2) {
-        cubeIndex |= nivel * (cubeCorners[j].w < isoLevel);
+        cubeIndex |= nivel * (valorCorners[j] < isoLevel);
     }
 
     for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3) {
@@ -103,9 +77,8 @@ void March(int3 id : SV_DispatchThreadID) {
             int a = cornerIndexAFromEdge[triangulation[cubeIndex][i + z]];
             int b = cornerIndexBFromEdge[triangulation[cubeIndex][i + z]];
 
-            vertices[z].vertex = interpolate(cubeCorners[a], cubeCorners[b]);
-            vertices[z].uv = float2(0, 0) + (usaUVs * interpolateExtremos(uvCorners[a], uvCorners[b]));
-            vertices[z].uv2 = float2(0, 0) + (usaUV2s * interpolateExtremos(uv2Corners[a], uv2Corners[b]));
+            vertices[z].vertex = interpolate(cubeCorners[a], valorCorners[a], cubeCorners[b], valorCorners[b]);
+            vertices[z].uvs = float4(0, 0, 0, 0) + (usaUVs * interpolateExtremos(uvCorners[a], valorCorners[a], uvCorners[b]));
         }
 
         Triangle tri;

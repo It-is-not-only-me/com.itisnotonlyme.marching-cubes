@@ -43,7 +43,7 @@ public class GeneradorDatosPerlin : GenerarDatos
         Vector3Int puntosPorEje = _numeroDePuntosPorEje;
         int cantidadDeDatos = puntosPorEje.x * puntosPorEje.y * puntosPorEje.z;
         Dato[] datos = new Dato[cantidadDeDatos];
-        Vector2[] uvs = new Vector2[cantidadDeDatos];
+        Vector4[] uvs = new Vector4[cantidadDeDatos];
 
         int contador = 0;
         for (int i = 0; i < puntosPorEje.x; i++)
@@ -58,7 +58,7 @@ public class GeneradorDatosPerlin : GenerarDatos
                     Vector3 posicionPerlin = posicion * _noiseScale + Vector3.one * 200;
                     float valor = Perlin3D(posicionPerlin);
 
-                    uvs[contador] = new Vector2(i % 2, j % 2);
+                    uvs[contador] = new Vector4(i % 2, j % 2, 0, 0);
                     datos[contador++].CargarDatos(posicion, valor);
                 }
 

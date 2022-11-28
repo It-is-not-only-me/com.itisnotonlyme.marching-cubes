@@ -12,15 +12,15 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer, _planosBuffer;
-        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs, _bufferUvs2;
-        private bool _usaUVs, _usaUV2s;
+        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs;
+        private bool _usaUVs;
         private GenerarDatos _generador;
         private Camera _camara;
 
         private int _cantidadDeFloatDatos = 4;
         private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
         private int _triangulosPorDato = 5;
-        private int _cantidadDeFloatUvs = 2;
+        private int _cantidadDeFloatUvs = 4;
 
         private void Awake()
         {
@@ -43,8 +43,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _bufferIndices = new BufferManager(indicesStride, CrearBuffer);
             _bufferUvs = new BufferManager(uvsStride, CrearBuffer);
             _usaUVs = true;
-            _bufferUvs2 = new BufferManager(uvsStride, CrearBuffer);
-            _usaUV2s = true;
 
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
@@ -62,7 +60,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _bufferTriangulos.Destruir();
             _bufferIndices.Destruir();
             _bufferUvs.Destruir();
-            _bufferUvs2.Destruir();
         }
 
         private void FixedUpdate()
@@ -108,11 +105,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             if (_usaUVs)
                 _bufferUvs.ObtenerBuffer(cantidadDeUvs).SetData(mesh.Uvs);
 
-            int cantidadDeUvs2 = mesh.Uvs2.Length;
-            _usaUV2s = cantidadDeUvs2 != 0;
-            if (_usaUV2s)
-                _bufferUvs2.ObtenerBuffer(cantidadDeUvs2).SetData(mesh.Uvs2);
-
             Dispatch();
         }
 
@@ -128,8 +120,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader().SetBuffer(kernel, "indices", _bufferIndices.Buffer);
             _datosRender.ComputeShader().SetBuffer(kernel, "uvs", _bufferUvs.Buffer);
             _datosRender.ComputeShader().SetBool("usaUVs", _usaUVs);
-            _datosRender.ComputeShader().SetBuffer(kernel, "uvs2", _bufferUvs2.Buffer);
-            _datosRender.ComputeShader().SetBool("usaUV2s", _usaUV2s);
 
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);

@@ -7,20 +7,17 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private Bounds _limites;
         private Dato[] _datos;
         private int[] _indices;
-        private Vector2[] _uv;
-        private Vector2[] _uv2;
+        private Vector4[] _uvs;
 
         public MarchingCubeMesh(Bounds limites,
                                 Dato[] datos = null,
                                 int[] indices = null,
-                                Vector2[] uv = null,
-                                Vector2[] uv2 = null)
+                                Vector4[] uvs = null)
         {
             _limites = limites;
             _datos = datos;
             _indices = indices;
-            _uv = uv;
-            _uv2 = uv2;
+            _uvs = uvs;
         }
 
         public Bounds Limites
@@ -55,31 +52,17 @@ namespace ItIsNotOnlyMe.MarchingCubes
 
         }
 
-        public Vector2[] Uvs
+        public Vector4[] Uvs
         {
             get
             {
-                if (_uv == null)
-                    _uv = new Vector2[Datos.Length];
-                return _uv;
+                if (_uvs == null)
+                    _uvs = new Vector4[Datos.Length];
+                return _uvs;
             }
             set
             {
-                _uv = value;
-            }
-        }
-
-        public Vector2[] Uvs2
-        {
-            get
-            {
-                if (_uv2 == null)
-                    _uv2 = new Vector2[Datos.Length];
-                return _uv2;
-            }
-            set
-            {
-                _uv2 = value; 
+                _uvs = value;
             }
         }
     }
