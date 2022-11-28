@@ -45,8 +45,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
             Indices = new int[cantidadIndices];
             CantidadElementos = cantidadElementos;
             Dimensiones = Mathf.CeilToInt(Mathf.Sqrt(cantidadElementos));
-            _datos = new Texture2D(Dimensiones, Dimensiones);
-            _uvs = new Texture2D(Dimensiones, Dimensiones);
+            _datos = new Texture2D(Dimensiones, Dimensiones, TextureFormat.RGBAFloat, false);
+            _uvs = new Texture2D(Dimensiones, Dimensiones, TextureFormat.RGBAFloat, false);
         }
 
         public void AgregarDato(Dato dato, int posicion) => AgregarDato(new Color(dato.Posicion.x, dato.Posicion.y, dato.Posicion.z, dato.Valor), posicion);

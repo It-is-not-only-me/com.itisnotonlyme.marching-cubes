@@ -44,8 +44,6 @@ public class GeneradorDatosPerlin : GenerarDatos
 
     private void GenerarMesh()
     {
-        Vector3Int puntosPorEje = _numeroDePuntosPorEje;
-
         for (int i = 0, contador = 0; i < _numeroDePuntosPorEje.x; i++)
             for (int j = 0; j < _numeroDePuntosPorEje.y; j++)
                 for (int k = 0; k < _numeroDePuntosPorEje.z; k++, contador++)
