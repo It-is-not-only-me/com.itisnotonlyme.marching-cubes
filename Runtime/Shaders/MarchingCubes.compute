@@ -7,7 +7,6 @@ struct Vertice {
     float3 vertex;
     float2 uv;
     float2 uv2;
-    float3 color;
 };
 
 struct Triangle {
@@ -29,8 +28,6 @@ StructuredBuffer<float2> uvs;
 bool usaUVs;
 StructuredBuffer<float2> uvs2;
 bool usaUV2s;
-StructuredBuffer<float4> colores;
-bool usaColores;
 
 int cantidadPorEje;
 int cantidadIndices;
@@ -75,12 +72,6 @@ float3 uv2AtIndex(int i) {
     return float3(uv2, valor);
 }
 
-float4 colorAtIndex(int i) {
-    float valor = datos[i].valor;
-    float3 color = colores[i].rgb;
-    return float4(color, valor);
-}
-
 [numthreads(numThreads, numThreads, numThreads)]
 void March(int3 id : SV_DispatchThreadID) {
 
@@ -91,14 +82,12 @@ void March(int3 id : SV_DispatchThreadID) {
     float4 cubeCorners[8];
     float3 uvCorners[8];
     float3 uv2Corners[8];
-    float4 colorCorners[8];
 
     for (int w = 0; w < 8; w++) {
         int indiceActual = indices[indice + w];
         cubeCorners[w] = pointAtIndex(indiceActual);
         uvCorners[w] = uvAtIndex(indiceActual);
         uv2Corners[w] = uv2AtIndex(indiceActual);
-        colorCorners[w] = colorAtIndex(indiceActual);
     }
 
     int cubeIndex = 0;
@@ -117,7 +106,6 @@ void March(int3 id : SV_DispatchThreadID) {
             vertices[z].vertex = interpolate(cubeCorners[a], cubeCorners[b]);
             vertices[z].uv = float2(0, 0) + (usaUVs * interpolateExtremos(uvCorners[a], uvCorners[b]));
             vertices[z].uv2 = float2(0, 0) + (usaUV2s * interpolateExtremos(uv2Corners[a], uv2Corners[b]));
-            vertices[z].color = float3(0, 0, 0) + (usaColores * interpolateExtremos(colorCorners[a], colorCorners[b]));
         }
 
         Triangle tri;

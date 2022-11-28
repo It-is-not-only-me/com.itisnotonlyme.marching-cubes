@@ -12,8 +12,8 @@ namespace ItIsNotOnlyMe.MarchingCubes
         [SerializeField] private DatosRender _datosRender;
 
         private ComputeBuffer _argBuffer, _planosBuffer;
-        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs, _bufferUvs2, _bufferColores;
-        private bool _usaUVs, _usaUV2s, _usaColores;
+        private BufferManager _bufferDatos, _bufferTriangulos, _bufferIndices, _bufferUvs, _bufferUvs2;
+        private bool _usaUVs, _usaUV2s;
         private GenerarDatos _generador;
         private Camera _camara;
 
@@ -21,7 +21,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
         private int _cantidadDeFloatTriangulos = 3 * 3 + 2 * 3 + 2 * 3 + 3 * 3;
         private int _triangulosPorDato = 5;
         private int _cantidadDeFloatUvs = 2;
-        private int _cantidadDeFloatColores = 4;
 
         private void Awake()
         {
@@ -38,7 +37,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             int triangulosStride = _cantidadDeFloatTriangulos * sizeof(float);
             int indicesStride = sizeof(int);
             int uvsStride = _cantidadDeFloatUvs * sizeof(float);
-            int coloresStride = _cantidadDeFloatColores * sizeof(float);
 
             _bufferDatos = new BufferManager(datosStride, CrearBuffer);
             _bufferTriangulos = new BufferManager(triangulosStride, CrearBufferAppend);
@@ -47,8 +45,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _usaUVs = true;
             _bufferUvs2 = new BufferManager(uvsStride, CrearBuffer);
             _usaUV2s = true;
-            _bufferColores = new BufferManager(coloresStride, CrearBuffer);
-            _usaColores = true;
 
             if (!TryGetComponent(out _generador))
                 Debug.LogError("No hay generador");
@@ -67,18 +63,20 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _bufferIndices.Destruir();
             _bufferUvs.Destruir();
             _bufferUvs2.Destruir();
-            _bufferColores.Destruir();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (_generador.Actualizar)
-            {
-                ActualizarDatos();
-                PasarInformacion();
-            }
-            
-            Render();
+                Actualizar();
+        }
+
+        private void Update() => Render();
+
+        private void Actualizar()
+        {
+            ActualizarDatos();
+            PasarInformacion();
         }
 
         public void CrearBufferAuxileares()
@@ -115,11 +113,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             if (_usaUV2s)
                 _bufferUvs2.ObtenerBuffer(cantidadDeUvs2).SetData(mesh.Uvs2);
 
-            int cantidadDeColores = mesh.Colores.Length;
-            _usaColores = cantidadDeColores != 0;
-            if (_usaColores)
-                _bufferColores.ObtenerBuffer(cantidadDeColores).SetData(mesh.Colores);
-
             Dispatch();
         }
 
@@ -137,8 +130,6 @@ namespace ItIsNotOnlyMe.MarchingCubes
             _datosRender.ComputeShader().SetBool("usaUVs", _usaUVs);
             _datosRender.ComputeShader().SetBuffer(kernel, "uvs2", _bufferUvs2.Buffer);
             _datosRender.ComputeShader().SetBool("usaUV2s", _usaUV2s);
-            _datosRender.ComputeShader().SetBuffer(kernel, "colores", _bufferColores.Buffer);
-            _datosRender.ComputeShader().SetBool("usaColores", _usaColores);
 
             _datosRender.ComputeShader().SetInt("cantidadPorEje", cantidadPorEjes);
             _datosRender.ComputeShader().SetInt("cantidadIndices", cantidadIndices);
